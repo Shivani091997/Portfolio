@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#050505;color:#f5f5f7;font-family:'Space Grotesk',sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{cursor:none;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:none}
+  ::selection{background:#2b7bff;color:#fff}
+  ::-webkit-scrollbar{width:0;height:0}
+  [data-reveal]{opacity:0;transform:translateY(46px)}
+  [data-reveal].in{opacity:1;transform:none}
+  @keyframes spinL{to{transform:rotate(360deg)}}
+  @keyframes spinR{to{transform:rotate(-360deg)}}
+  @keyframes floatA{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+  @keyframes floatB{0%,100%{transform:translateY(0)}50%{transform:translateY(20px)}}
+  @keyframes glowPulse{0%,100%{opacity:.55}50%{opacity:1}}
+  @keyframes blobMove{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(5%,-4%) scale(1.08)}66%{transform:translate(-4%,3%) scale(.96)}}
+  @keyframes gridPan{to{background-position:80px 80px}}
+  @keyframes loadLetter{0%{transform:translateY(115%) rotate(8deg);opacity:0}100%{transform:translateY(0) rotate(0);opacity:1}}
+  @keyframes loadBar{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+  @keyframes shimmer{to{background-position:200% center}}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  @keyframes scrollNudge{0%{transform:translateY(0);opacity:0}40%{opacity:1}100%{transform:translateY(14px);opacity:0}}
+  @keyframes marquee{to{transform:translateX(-50%)}}
+  @media(max-width:860px){
+    [data-r="herogrid"]{grid-template-columns:1fr!important;text-align:center}
+    [data-r="herovis"]{margin:40px auto 0!important;height:62vh!important}
+    [data-r="herobtns"]{justify-content:center}
+    [data-r="split"]{grid-template-columns:1fr!important}
+    [data-r="contactgrid"]{grid-template-columns:1fr!important}
+    [data-r="devrow"]{flex-direction:column!important;align-items:center}
+    [data-r="nav-links"]{display:none!important}
+    [data-r="hamburger"]{display:flex!important}
+    [data-r="bigname"]{font-size:18vw!important}
+    [data-r="pricegrid"]{grid-template-columns:1fr!important;max-width:440px;margin-left:auto;margin-right:auto}
+    [data-r="featcard"]{grid-template-columns:1fr!important}
+    [data-r="statgrid"]{grid-template-columns:repeat(2,1fr)!important;gap:12px!important}
+  }
+  @media(max-width:640px){
+    [data-r="gallery"]{column-count:1!important}
+    [data-r="contactbtns"] a{width:100%!important;justify-content:center}
+  }
+</style>
+</helmet>
+
+<div style="position:relative;width:100%;min-height:100vh;background:#050505;overflow:hidden">
+
+  <canvas id="sp-canvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none"></canvas>
+
+  <div style="position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(43,123,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(43,123,255,.05) 1px,transparent 1px);background-size:80px 80px;animation:gridPan 16s linear infinite;opacity:.4"></div>
+
+  <div style="position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;mix-blend-mode:overlay;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E&quot;)"></div>
+
+  <div id="sp-loader" style="position:fixed;inset:0;z-index:9999;background:#050505;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px">
+    <div style="display:flex;flex-direction:column;align-items:center;line-height:.9">
+      <div style="overflow:hidden;display:flex">
+        <span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .05s both">S</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .11s both">H</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .17s both">I</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .23s both">V</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .29s both">A</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .35s both">N</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:700;letter-spacing:-.02em;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .41s both">I</span>
+      </div>
+      <div style="overflow:hidden;display:flex">
+        <span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .48s both">P</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .54s both">A</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .6s both">T</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .66s both">I</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .72s both">D</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .78s both">A</span><span style="display:inline-block;font-size:clamp(40px,9vw,120px);font-weight:300;letter-spacing:.04em;color:#39ff8e;animation:loadLetter .7s cubic-bezier(.16,1,.3,1) .84s both">R</span>
+      </div>
+    </div>
+    <div style="width:200px;height:2px;background:rgba(255,255,255,.08);overflow:hidden;border-radius:2px">
+      <div style="height:100%;width:100%;background:linear-gradient(90deg,#2b7bff,#39ff8e);transform-origin:left;animation:loadBar 2.2s cubic-bezier(.7,0,.3,1) .2s both"></div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.34em;color:rgba(245,245,247,.4);text-transform:uppercase">Crafting the experience</div>
+  </div>
+
+  <div id="sp-cursor" style="position:fixed;top:0;left:0;z-index:9000;pointer-events:none;width:34px;height:34px;border:1px solid rgba(57,255,142,.7);border-radius:50%;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s;will-change:transform"></div>
+  <div id="sp-cursor-dot" style="position:fixed;top:0;left:0;z-index:9001;pointer-events:none;width:5px;height:5px;background:#39ff8e;border-radius:50%;transform:translate(-50%,-50%);will-change:transform"></div>
+
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:22px clamp(20px,6vw,90px);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:linear-gradient(180deg,rgba(5,5,5,.7),rgba(5,5,5,0))">
+    <button data-cursor onClick="{{ goHome }}" style="display:flex;align-items:center;gap:12px;background:none;border:none">
+      <span style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2b7bff,#39ff8e);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#050505;box-shadow:0 0 22px rgba(43,123,255,.5)">SP</span>
+      <span style="font-weight:600;font-size:15px;letter-spacing:.01em">Shivani Patidar</span>
+    </button>
+    <div data-r="nav-links" style="display:flex;align-items:center;gap:8px;padding:7px;border-radius:40px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(14px)">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="3">
+        <button data-cursor onClick="{{ item.go }}" style="padding:9px 20px;border-radius:30px;background:none;border:none;font-size:14px;font-weight:500;white-space:nowrap;color:rgba(245,245,247,.8)" style-hover="color:#fff;background:rgba(255,255,255,.06)">{{ item.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="tel:+917089345954" data-magnetic data-cursor style="position:relative;padding:11px 24px;border-radius:30px;border:1px solid rgba(57,255,142,.4);background:rgba(57,255,142,.06);font-size:14px;font-weight:600;white-space:nowrap;color:#39ff8e;text-decoration:none" style-hover="background:rgba(57,255,142,.14)">Let's talk</a>
+      <button data-r="hamburger" data-cursor onClick="{{ toggleMenu }}" style="display:none;flex-direction:column;gap:5px;width:44px;height:44px;align-items:center;justify-content:center;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)">
+        <span style="width:18px;height:2px;background:#f5f5f7;border-radius:2px"></span>
+        <span style="width:18px;height:2px;background:#f5f5f7;border-radius:2px"></span>
+        <span style="width:18px;height:2px;background:#f5f5f7;border-radius:2px"></span>
+      </button>
+    </div>
+  </nav>
+
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:199;background:rgba(5,5,5,.94);backdrop-filter:blur(22px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:40px">
+    <button data-cursor onClick="{{ closeMenu }}" style="position:absolute;top:24px;right:24px;width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);color:#fff;font-size:20px">✕</button>
+    <sc-for list="{{ navMobile }}" as="item" hint-placeholder-count="3">
+      <button data-cursor onClick="{{ item.go }}" style="background:none;border:none;color:#f5f5f7;font-size:clamp(30px,9vw,42px);font-weight:700;letter-spacing:-.02em;padding:10px">{{ item.label }}</button>
+    </sc-for>
+    <a href="tel:+917089345954" data-cursor style="margin-top:24px;padding:16px 42px;border-radius:40px;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-weight:700;font-size:16px;text-decoration:none">Call Now</a>
+  </div>
+  </sc-if>
+
+  <!-- ============ HOME ============ -->
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="Home" style="position:relative;z-index:10">
+
+    <!-- HERO -->
+    <section data-screen-label="Hero" style="position:relative;min-height:100vh;display:flex;align-items:center;padding:120px clamp(20px,6vw,90px) 60px;overflow:hidden">
+      <div data-parallax="-0.08" style="position:absolute;top:8%;left:-6%;width:46vw;height:46vw;max-width:680px;max-height:680px;border-radius:50%;background:radial-gradient(circle,rgba(43,123,255,.35),transparent 62%);filter:blur(40px);animation:blobMove 18s ease-in-out infinite;pointer-events:none"></div>
+      <div data-parallax="0.06" style="position:absolute;bottom:2%;right:-4%;width:40vw;height:40vw;max-width:560px;max-height:560px;border-radius:50%;background:radial-gradient(circle,rgba(57,255,142,.22),transparent 62%);filter:blur(44px);animation:blobMove 22s ease-in-out infinite reverse;pointer-events:none"></div>
+
+      <div data-r="herogrid" style="position:relative;width:100%;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;z-index:2">
+        <div>
+          <div data-reveal style="display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:26px">
+            <span style="width:8px;height:8px;border-radius:50%;background:#39ff8e;box-shadow:0 0 12px #39ff8e;animation:glowPulse 2s infinite"></span>Hello, I'm
+          </div>
+          <h1 data-reveal style="font-size:clamp(46px,7.4vw,112px);font-weight:700;line-height:.94;letter-spacing:-.03em;margin-bottom:24px">
+            Shivani<br><span style="background:linear-gradient(90deg,#2b7bff,#39ff8e,#2b7bff);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 6s linear infinite">Patidar</span>
+          </h1>
+          <div data-reveal style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px">
+            <span style="padding:8px 16px;border-radius:30px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:13px;font-weight:500;letter-spacing:.02em">UI/UX Designer</span>
+            <span style="padding:8px 16px;border-radius:30px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:13px;font-weight:500;letter-spacing:.02em">Web Designer</span>
+            <span style="padding:8px 16px;border-radius:30px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);font-size:13px;font-weight:500;letter-spacing:.02em">Social Media Designer</span>
+          </div>
+          <p data-reveal style="max-width:480px;font-size:clamp(15px,1.5vw,18px);line-height:1.7;color:rgba(245,245,247,.62);margin-bottom:38px;text-wrap:pretty">Creating intuitive digital experiences, modern websites, and engaging visual content that connect brands with people.</p>
+          <div data-reveal data-r="herobtns" style="display:flex;flex-wrap:wrap;gap:16px">
+            <button data-magnetic data-cursor onClick="{{ goWork }}" style="padding:16px 30px;border-radius:40px;border:none;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:15px;font-weight:700;box-shadow:0 12px 40px rgba(43,123,255,.4)">View Work →</button>
+            <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:16px 30px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:15px;font-weight:600" style-hover="background:rgba(255,255,255,.08)">Contact Me</button>
+          </div>
+        </div>
+
+        <div data-r="herovis" style="position:relative;height:78vh;max-height:760px;display:flex;align-items:center;justify-content:center">
+          <div data-r="bigname" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(80px,11vw,200px);font-weight:700;letter-spacing:-.04em;color:rgba(255,255,255,.035);white-space:nowrap;z-index:0;pointer-events:none;text-align:center;line-height:.85">SHIVANI<br>PATIDAR</div>
+
+          <div id="orbit1" style="position:absolute;width:108%;height:108%;display:flex;align-items:center;justify-content:center;z-index:1;pointer-events:none">
+            <div style="position:absolute;width:78%;height:78%;border-radius:50%;border:1px solid rgba(43,123,255,.35);transform:rotateX(72deg);animation:spinL 18s linear infinite"></div>
+            <div style="position:absolute;width:92%;height:92%;border-radius:50%;border:1px solid rgba(57,255,142,.28);transform:rotateX(68deg) rotateY(12deg);animation:spinR 26s linear infinite"></div>
+            <div style="position:absolute;width:64%;height:64%;border-radius:50%;border:1px dashed rgba(255,255,255,.16);transform:rotateX(75deg);animation:spinL 32s linear infinite"></div>
+          </div>
+
+          <div id="orbit2" style="position:absolute;width:100%;height:100%;z-index:3;pointer-events:none">
+            <div style="position:absolute;top:8%;left:6%;width:14px;height:14px;border-radius:50%;background:#39ff8e;box-shadow:0 0 24px #39ff8e;animation:floatA 6s ease-in-out infinite"></div>
+            <div style="position:absolute;bottom:14%;right:4%;width:10px;height:10px;border-radius:50%;background:#2b7bff;box-shadow:0 0 22px #2b7bff;animation:floatB 7s ease-in-out infinite"></div>
+            <div style="position:absolute;top:20%;right:10%;width:46px;height:46px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);backdrop-filter:blur(10px);animation:floatA 8s ease-in-out infinite"></div>
+            <div style="position:absolute;bottom:8%;left:12%;width:60px;height:36px;border-radius:12px;border:1px solid rgba(57,255,142,.25);background:rgba(57,255,142,.05);backdrop-filter:blur(8px);animation:floatB 9s ease-in-out infinite"></div>
+          </div>
+
+          <div id="heroPortrait" style="position:relative;z-index:2;width:clamp(280px,30vw,420px);height:78%;border-radius:200px 200px 28px 28px;overflow:hidden;border:1px solid rgba(255,255,255,.12);box-shadow:0 40px 100px rgba(43,123,255,.25),0 0 80px rgba(57,255,142,.12);background:#0a0a0a">
+            <img src="assets/portrait.png" alt="Shivani Patidar" style="width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block">
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(5,5,5,.55))"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(180deg,transparent,rgba(43,123,255,.12))"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:4">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.28em;color:rgba(245,245,247,.4);text-transform:uppercase">Scroll</span>
+        <span style="width:1px;height:30px;background:linear-gradient(rgba(57,255,142,.8),transparent);position:relative"><span style="position:absolute;top:0;left:-2px;width:5px;height:5px;border-radius:50%;background:#39ff8e;animation:scrollNudge 1.8s ease-in-out infinite"></span></span>
+      </div>
+    </section>
+
+    <!-- EXPERTISE -->
+    <section data-screen-label="Expertise" style="position:relative;padding:clamp(80px,11vh,150px) clamp(20px,6vw,90px);max-width:1400px;margin:0 auto">
+      <div data-reveal style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:60px">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 01 — Expertise</div>
+          <h2 style="font-size:clamp(38px,6vw,84px);font-weight:700;line-height:.96;letter-spacing:-.03em">What I Do</h2>
+        </div>
+        <p style="max-width:340px;font-size:15px;line-height:1.7;color:rgba(245,245,247,.55)">Four disciplines, one obsession — designing things that feel as good as they look.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px">
+        <sc-for list="{{ expertise }}" as="card" hint-placeholder-count="4">
+          <div data-reveal data-tilt data-cursor style="position:relative;padding:34px 30px;border-radius:24px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);min-height:280px;display:flex;flex-direction:column;justify-content:space-between;transition:border-color .4s,box-shadow .4s;transform-style:preserve-3d" style-hover="border-color:rgba(57,255,142,.4);box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 50px rgba(57,255,142,.12)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(43,123,255,.9);letter-spacing:.1em;transform:translateZ(30px)">{{ card.n }}</div>
+            <div style="transform:translateZ(40px)">
+              <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(43,123,255,.25),rgba(57,255,142,.18));border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:22px;font-size:20px">{{ card.icon }}</div>
+              <h3 style="font-size:23px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em">{{ card.t }}</h3>
+              <p style="font-size:14px;line-height:1.6;color:rgba(245,245,247,.55)">{{ card.d }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE / JOURNEY -->
+    <section data-screen-label="Journey" style="position:relative;padding:clamp(80px,11vh,150px) clamp(20px,6vw,90px);overflow:hidden">
+      <div style="max-width:1400px;margin:0 auto">
+        <div data-reveal style="margin-bottom:60px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 02 — Experience</div>
+          <h2 style="font-size:clamp(38px,6vw,84px);font-weight:700;line-height:.96;letter-spacing:-.03em">My Journey</h2>
+        </div>
+        <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+          <div style="position:absolute;top:42px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(43,123,255,.5),rgba(57,255,142,.5),transparent);z-index:0"></div>
+          <sc-for list="{{ journey }}" as="step" hint-placeholder-count="3">
+            <div data-reveal data-cursor style="position:relative;z-index:1">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">
+                <span style="width:18px;height:18px;border-radius:50%;background:#050505;border:2px solid #39ff8e;box-shadow:0 0 18px rgba(57,255,142,.6);flex-shrink:0"></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:.08em;color:#2b7bff;font-weight:500">{{ step.year }}</span>
+              </div>
+              <div style="padding:26px;border-radius:20px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px);transition:transform .4s,border-color .4s" style-hover="transform:translateY(-6px);border-color:rgba(57,255,142,.3)">
+                <h3 style="font-size:20px;font-weight:600;margin-bottom:8px;letter-spacing:-.01em">{{ step.role }}</h3>
+                <p style="font-size:14px;color:rgba(245,245,247,.55)">{{ step.org }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section data-screen-label="Education" style="position:relative;padding:clamp(60px,8vh,110px) clamp(20px,6vw,90px);max-width:1400px;margin:0 auto">
+      <div data-reveal style="margin-bottom:50px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 03 — Education</div>
+        <h2 style="font-size:clamp(38px,6vw,84px);font-weight:700;line-height:.96;letter-spacing:-.03em">Education</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px">
+        <sc-for list="{{ education }}" as="ed" hint-placeholder-count="2">
+          <div data-reveal data-cursor style="position:relative;padding:38px;border-radius:24px;background:linear-gradient(135deg,rgba(43,123,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px);overflow:hidden;transition:transform .4s,border-color .4s" style-hover="transform:translateY(-6px);border-color:rgba(43,123,255,.4)">
+            <div style="position:absolute;top:-20px;right:-10px;font-size:130px;font-weight:700;color:rgba(255,255,255,.03);letter-spacing:-.04em">{{ ed.year }}</div>
+            <div style="position:relative;z-index:1">
+              <div style="font-size:clamp(36px,4vw,52px);font-weight:700;letter-spacing:-.02em;margin-bottom:14px;background:linear-gradient(90deg,#2b7bff,#39ff8e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">{{ ed.deg }}</div>
+              <p style="font-size:17px;font-weight:500;margin-bottom:8px">{{ ed.school }}</p>
+              <p style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(245,245,247,.5);letter-spacing:.06em">Class of {{ ed.year }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- FEATURED WORK -->
+    <section id="featured" data-screen-label="Featured Work" style="position:relative;padding:clamp(80px,11vh,150px) clamp(20px,6vw,90px);max-width:1400px;margin:0 auto">
+      <div data-reveal style="margin-bottom:56px;text-align:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 04 — Featured Work</div>
+        <h2 style="font-size:clamp(38px,6vw,84px);font-weight:700;line-height:.96;letter-spacing:-.03em">Selected Projects</h2>
+      </div>
+      <div data-r="split" style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div data-reveal data-cursor onClick="{{ goSocial }}" style="position:relative;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.08);min-height:440px;background:linear-gradient(160deg,rgba(57,255,142,.1),rgba(5,5,5,.4));display:flex;flex-direction:column;justify-content:flex-end;padding:42px;transition:transform .5s,border-color .5s" style-hover="transform:translateY(-8px);border-color:rgba(57,255,142,.4)">
+          <div style="position:absolute;inset:0;background-image:url(assets/project-ujjain.jpg);background-size:cover;background-position:center;opacity:.34;transition:opacity .5s,transform .5s" style-hover="opacity:.5;transform:scale(1.05)"></div>
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,5,.2),rgba(5,5,5,.85))"></div>
+          <div style="position:relative;z-index:1">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;color:#39ff8e;margin-bottom:14px;text-transform:uppercase">Category 01</div>
+            <h3 style="font-size:clamp(28px,3.4vw,46px);font-weight:700;line-height:1;letter-spacing:-.02em;margin-bottom:14px">Social Media<br>Designs</h3>
+            <p style="font-size:15px;color:rgba(245,245,247,.65);max-width:340px;margin-bottom:22px">Festival, food, jewellery & corporate creatives that stop the scroll.</p>
+            <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#39ff8e">Explore Gallery →</span>
+          </div>
+        </div>
+        <div data-reveal data-cursor onClick="{{ goUiux }}" style="position:relative;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.08);min-height:440px;background:linear-gradient(160deg,rgba(43,123,255,.12),rgba(5,5,5,.4));display:flex;flex-direction:column;justify-content:flex-end;padding:42px;transition:transform .5s,border-color .5s" style-hover="transform:translateY(-8px);border-color:rgba(43,123,255,.45)">
+          <div style="position:absolute;top:32px;right:32px;display:flex;gap:10px;opacity:.7">
+            <span style="width:60px;height:120px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(160deg,rgba(43,123,255,.2),rgba(255,255,255,.04));animation:floatA 6s ease-in-out infinite"></span>
+            <span style="width:90px;height:90px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:linear-gradient(160deg,rgba(57,255,142,.16),rgba(255,255,255,.04));margin-top:30px;animation:floatB 7s ease-in-out infinite"></span>
+          </div>
+          <div style="position:relative;z-index:1">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;color:#2b7bff;margin-bottom:14px;text-transform:uppercase">Category 02</div>
+            <h3 style="font-size:clamp(28px,3.4vw,46px);font-weight:700;line-height:1;letter-spacing:-.02em;margin-bottom:14px">Website &<br>UI/UX Designs</h3>
+            <p style="font-size:15px;color:rgba(245,245,247,.65);max-width:340px;margin-bottom:22px">Product flows, dashboards & responsive sites built around real users.</p>
+            <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#2b7bff">View Case Studies →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOCIAL MEDIA GROWTH PLANS -->
+    <section data-screen-label="Pricing" style="position:relative;padding:clamp(80px,11vh,150px) clamp(20px,6vw,90px);max-width:1300px;margin:0 auto">
+      <div style="position:absolute;top:16%;left:50%;transform:translateX(-50%);width:72%;height:64%;background:radial-gradient(circle,rgba(57,255,142,.1),rgba(43,123,255,.05) 45%,transparent 70%);filter:blur(64px);pointer-events:none"></div>
+      <div data-reveal style="position:relative;text-align:center;margin-bottom:58px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 05 — Services</div>
+        <h2 style="font-size:clamp(34px,5.4vw,76px);font-weight:700;line-height:.98;letter-spacing:-.03em;margin-bottom:20px">Social Media Growth Plans</h2>
+        <p style="font-size:clamp(15px,1.6vw,18px);line-height:1.7;color:rgba(245,245,247,.6);max-width:600px;margin:0 auto;text-wrap:pretty">Affordable social media management packages designed to help businesses stay active, professional, and visible online.</p>
+      </div>
+      <div data-r="pricegrid" style="position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch">
+        <sc-for list="{{ plans }}" as="plan" hint-placeholder-count="3">
+          <div data-reveal style="position:relative;display:flex">
+            <div data-tilt data-cursor style="position:relative;width:100%;display:flex;flex-direction:column;padding:38px 30px;border-radius:24px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(22px);box-shadow:0 30px 60px rgba(0,0,0,.4);transform-style:preserve-3d;transition:box-shadow .4s,border-color .4s" style-hover="box-shadow:0 44px 90px rgba(0,0,0,.55),0 0 60px rgba(57,255,142,.12);border-color:rgba(57,255,142,.35)">
+              <sc-if value="{{ plan.popular }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;inset:-1px;border-radius:24px;border:1.5px solid rgba(57,255,142,.55);box-shadow:0 0 60px rgba(57,255,142,.22);pointer-events:none"></div>
+                <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:30px;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 8px 26px rgba(57,255,142,.45);z-index:2">★ Most Popular</div>
+              </sc-if>
+              <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#39ff8e;margin-bottom:6px">{{ plan.name }}</div>
+                <div style="font-size:13px;color:rgba(245,245,247,.5);margin-bottom:24px">{{ plan.tagline }}</div>
+                <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:0 7px;margin-bottom:26px">
+                  <span data-countup="{{ plan.price }}" data-prefix="₹" style="font-size:clamp(32px,3.4vw,46px);font-weight:700;letter-spacing:-.02em;line-height:1.1;white-space:nowrap">₹0</span>
+                  <span style="font-size:14px;color:rgba(245,245,247,.5)">/ Month</span>
+                </div>
+                <div style="height:1px;background:rgba(255,255,255,.08);margin-bottom:24px"></div>
+                <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px">
+                  <sc-for list="{{ plan.features }}" as="f" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:flex-start;gap:12px;font-size:14px;line-height:1.45;color:rgba(245,245,247,.82)">
+                      <span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;background:rgba(57,255,142,.14);color:#39ff8e;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px">✓</span><span style="flex:1;min-width:0">{{ f }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <button data-magnetic data-cursor onClick="{{ plan.go }}" style="margin-top:auto;padding:15px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:15px;font-weight:600" style-hover="border-color:rgba(57,255,142,.5);background:rgba(57,255,142,.1);color:#39ff8e">Contact Me</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div data-reveal style="position:relative;margin-top:50px;display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center">
+        <p style="font-size:clamp(18px,2.2vw,24px);font-weight:600;letter-spacing:-.01em">Need a custom package?<br><span style="display:inline-block;margin-top:8px;color:rgba(245,245,247,.55);font-weight:400;font-size:16px">Contact me for a tailored social media solution.</span></p>
+        <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:16px 34px;border-radius:40px;border:1px solid rgba(57,255,142,.4);background:rgba(57,255,142,.07);color:#39ff8e;font-size:15px;font-weight:600" style-hover="background:rgba(57,255,142,.15)">Get Custom Quote →</button>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" data-screen-label="Contact" style="position:relative;padding:clamp(80px,11vh,150px) clamp(20px,6vw,90px) 80px;max-width:1200px;margin:0 auto">
+      <div data-reveal style="position:relative;border-radius:36px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);backdrop-filter:blur(24px);padding:clamp(40px,6vw,80px)">
+        <div style="position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:80%;height:120%;background:radial-gradient(circle,rgba(43,123,255,.22),transparent 60%);filter:blur(50px);pointer-events:none"></div>
+        <div style="position:relative;z-index:1;text-align:center;margin-bottom:48px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:20px">// 06 — Contact</div>
+          <h2 style="font-size:clamp(34px,6vw,80px);font-weight:700;line-height:1;letter-spacing:-.03em;margin-bottom:20px;text-wrap:balance">Let's Create<br>Something <span style="background:linear-gradient(90deg,#2b7bff,#39ff8e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Amazing</span></h2>
+          <p style="font-size:16px;color:rgba(245,245,247,.6);max-width:440px;margin:0 auto">Have a project in mind? Let's turn it into an experience worth remembering.</p>
+        </div>
+        <div data-r="contactgrid" style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px;margin:0 auto 40px">
+          <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="4">
+            <a href="{{ c.href }}" data-cursor data-magnetic style="display:flex;align-items:center;gap:18px;padding:22px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);transition:border-color .4s,background .4s" style-hover="border-color:rgba(57,255,142,.4);background:rgba(57,255,142,.05)">
+              <span style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(43,123,255,.25),rgba(57,255,142,.18));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">{{ c.icon }}</span>
+              <span style="min-width:0">
+                <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(245,245,247,.45);margin-bottom:5px">{{ c.label }}</span>
+                <span style="display:block;font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.value }}</span>
+              </span>
+            </a>
+          </sc-for>
+        </div>
+        <div data-r="contactbtns" style="position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
+          <a href="tel:+917089345954" data-magnetic data-cursor style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:40px;border:none;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:15px;font-weight:700;text-decoration:none;box-shadow:0 14px 42px rgba(43,123,255,.4)"><span style="font-size:17px">✆</span>Call Now</a>
+          <a href="mailto:patidarshivani150@gmail.com" data-magnetic data-cursor style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:15px;font-weight:600;text-decoration:none" style-hover="border-color:rgba(57,255,142,.45);color:#39ff8e">Send Email</a>
+          <a href="https://www.linkedin.com/in/shivani-patidar-uiux/" target="_blank" rel="noopener" data-magnetic data-cursor style="display:inline-flex;align-items:center;gap:10px;padding:16px 32px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:15px;font-weight:600;text-decoration:none" style-hover="border-color:rgba(43,123,255,.45);color:#2b7bff">Connect on LinkedIn</a>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ============ SOCIAL MEDIA PAGE ============ -->
+  <sc-if value="{{ isSocial }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Social Media" style="position:relative;z-index:10">
+    <section data-screen-label="Social Hero" style="position:relative;min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:140px clamp(20px,6vw,90px) 60px;overflow:hidden">
+      <div data-parallax="-0.1" style="position:absolute;top:10%;left:8%;width:36vw;height:36vw;max-width:480px;border-radius:50%;background:radial-gradient(circle,rgba(57,255,142,.22),transparent 62%);filter:blur(44px);animation:blobMove 20s ease-in-out infinite;pointer-events:none"></div>
+      <div id="posterField" style="position:absolute;inset:0;z-index:1;pointer-events:none">
+        <div data-poster style="position:absolute;top:16%;left:9%;width:150px;height:200px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 60px rgba(0,0,0,.5);background-image:url(assets/project-ujjain.jpg);background-size:cover;background-position:center;animation:floatA 7s ease-in-out infinite;opacity:.85"></div>
+        <div data-poster data-cursor style="position:absolute;top:22%;right:10%;width:140px;height:188px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 30px rgba(57,255,142,.14);background-image:url('assets/proj-pettep-vaccine.png');background-size:cover;background-position:top;pointer-events:auto;transition:transform .4s,box-shadow .4s;animation:floatB 9s ease-in-out infinite;opacity:.9" style-hover="transform:scale(1.06);box-shadow:0 42px 84px rgba(0,0,0,.6),0 0 54px rgba(57,255,142,.28)"></div>
+        <div data-poster data-cursor style="position:absolute;bottom:14%;left:14%;width:140px;height:140px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 30px rgba(43,123,255,.14);background-image:url('assets/proj-gigabiz-prelaunch.png');background-size:cover;background-position:top;pointer-events:auto;transition:transform .4s,box-shadow .4s;animation:floatA 8s ease-in-out infinite;opacity:.9" style-hover="transform:scale(1.06);box-shadow:0 42px 84px rgba(0,0,0,.6),0 0 54px rgba(43,123,255,.28)"></div>
+        <div data-poster data-cursor style="position:absolute;bottom:18%;right:13%;width:130px;height:130px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 30px rgba(57,255,142,.12);background-image:url('assets/proj-sharadey-counselling.jpg');background-size:cover;background-position:top;pointer-events:auto;transition:transform .4s,box-shadow .4s;animation:floatB 7.5s ease-in-out infinite;opacity:.9" style-hover="transform:scale(1.06);box-shadow:0 42px 84px rgba(0,0,0,.6),0 0 54px rgba(57,255,142,.24)"></div>
+        <div data-poster style="position:absolute;top:13%;left:4%;width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:0 0 36px rgba(225,48,108,.42);animation:floatA 7s ease-in-out infinite">
+          <span style="position:relative;width:26px;height:26px;border:2.5px solid #fff;border-radius:8px"><span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:11px;height:11px;border:2.5px solid #fff;border-radius:50%"></span><span style="position:absolute;top:4px;right:4px;width:3px;height:3px;border-radius:50%;background:#fff"></span></span>
+        </div>
+        <div data-poster style="position:absolute;top:30%;right:5%;width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:0 0 36px rgba(24,119,242,.45);animation:floatB 8.5s ease-in-out infinite">
+          <span style="font-family:Georgia,serif;font-size:32px;font-weight:700;line-height:1;color:#fff">f</span>
+        </div>
+        <div data-poster style="position:absolute;bottom:24%;left:7%;width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:0 0 36px rgba(10,102,194,.45);animation:floatA 9s ease-in-out infinite">
+          <span style="font-size:21px;font-weight:700;color:#fff;letter-spacing:-.02em">in</span>
+        </div>
+        <div data-poster style="position:absolute;bottom:15%;right:7%;width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:0 0 36px rgba(255,0,0,.4);animation:floatB 7.8s ease-in-out infinite">
+          <span style="width:0;height:0;border-left:15px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px"></span>
+        </div>
+      </div>
+      <div style="position:relative;z-index:2;text-align:center">
+        <div data-reveal style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:26px">Portfolio — Social Media</div>
+        <h1 data-reveal style="font-size:clamp(40px,9.4vw,150px);font-weight:700;line-height:.88;letter-spacing:-.04em">SOCIAL MEDIA<br>THAT BUILDS<br><span style="-webkit-text-stroke:1.5px rgba(57,255,142,.6);-webkit-text-fill-color:transparent;color:transparent">BRANDS</span></h1>
+        <p data-reveal style="max-width:560px;margin:30px auto 0;font-size:clamp(15px,1.6vw,18px);line-height:1.7;color:rgba(245,245,247,.62);text-wrap:pretty">Professional social media designs and management services that help businesses attract attention and grow online.</p>
+      </div>
+    </section>
+
+    <!-- 01 SHOWCASE + STATS -->
+    <section data-screen-label="Showcase" style="position:relative;padding:clamp(60px,8vh,120px) clamp(20px,6vw,90px) clamp(30px,4vh,60px);max-width:1300px;margin:0 auto">
+      <div data-reveal style="text-align:center;max-width:880px;margin:0 auto 56px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// Social Media Design Showcase</div>
+        <h2 style="font-size:clamp(32px,5vw,72px);font-weight:700;line-height:1;letter-spacing:-.03em;margin-bottom:20px;text-wrap:balance">Designs That Drive Attention &amp; Results</h2>
+        <p style="font-size:clamp(15px,1.6vw,18px);line-height:1.7;color:rgba(245,245,247,.6);max-width:620px;margin:0 auto;text-wrap:pretty">From branding and promotional campaigns to corporate communication and product marketing.</p>
+      </div>
+      <div data-reveal data-r="statgrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:920px;margin:0 auto">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+          <div style="text-align:center;padding:34px 18px;border-radius:22px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px)">
+            <span data-countup="{{ s.n }}" data-suffix="{{ s.suffix }}" style="display:inline-block;font-size:clamp(38px,5vw,62px);font-weight:700;letter-spacing:-.03em;line-height:1;background:linear-gradient(90deg,#2b7bff,#39ff8e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">0</span>
+            <div style="margin-top:10px;font-size:14px;color:rgba(245,245,247,.62)">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 02 FEATURED PROJECTS -->
+    <section data-screen-label="Featured Projects" style="position:relative;padding:clamp(40px,6vh,80px) clamp(20px,6vw,90px);max-width:1300px;margin:0 auto">
+      <div data-reveal style="margin-bottom:48px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// Featured Projects</div>
+        <h2 style="font-size:clamp(34px,5.4vw,76px);font-weight:700;line-height:.98;letter-spacing:-.03em">Case Studies</h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:26px">
+        <sc-for list="{{ featured }}" as="p" hint-placeholder-count="5">
+          <div data-reveal data-cursor onClick="{{ p.open }}" data-r="featcard" style="position:relative;display:grid;grid-template-columns:1fr 1.05fr;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);backdrop-filter:blur(16px);min-height:360px;transition:border-color .5s,transform .5s" style-hover="border-color:rgba(57,255,142,.35);transform:translateY(-6px)">
+            <div style="padding:clamp(30px,4vw,52px);display:flex;flex-direction:column;justify-content:center">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#2b7bff;padding:6px 14px;border-radius:30px;border:1px solid rgba(43,123,255,.3);background:rgba(43,123,255,.06)">{{ p.cat }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.06em;color:rgba(245,245,247,.55);padding:6px 14px;border-radius:30px;border:1px solid rgba(255,255,255,.1)">{{ p.featTag }}</span>
+              </div>
+              <h3 style="font-size:clamp(24px,3vw,38px);font-weight:700;line-height:1.04;letter-spacing:-.02em;margin-bottom:10px">{{ p.name }}</h3>
+              <div style="font-size:14px;color:#39ff8e;font-weight:500;margin-bottom:18px">{{ p.client }}</div>
+              <p style="font-size:15px;line-height:1.7;color:rgba(245,245,247,.6);max-width:440px;margin-bottom:26px;text-wrap:pretty">{{ p.desc }}</p>
+              <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#fff">View case study →</span>
+            </div>
+            <div style="position:relative;overflow:hidden;min-height:300px;background:#0a0a0a">
+              <div style="position:absolute;inset:0;background-image:url('{{ p.img }}');background-size:cover;background-position:center;transition:transform .7s cubic-bezier(.16,1,.3,1)" style-hover="transform:scale(1.05)"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.55),transparent 30%)"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 06 3D GALLERY -->
+    <section data-screen-label="3D Gallery" style="position:relative;padding:clamp(50px,7vh,100px) 0;overflow:hidden">
+      <div data-reveal style="text-align:center;padding:0 clamp(20px,6vw,90px);margin-bottom:30px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// Gallery Experience</div>
+        <h2 style="font-size:clamp(30px,4.6vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1">A Wall of Framed Work</h2>
+        <p style="font-size:13px;color:rgba(245,245,247,.5);margin-top:14px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em">— drag / swipe to explore —</p>
+      </div>
+      <div id="frameStrip" style="display:flex;gap:34px;overflow-x:auto;overflow-y:hidden;padding:50px clamp(40px,12vw,180px);perspective:1500px;scroll-snap-type:x proximity">
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="6">
+          <div data-cursor onClick="{{ p.open }}" style="flex:0 0 auto;scroll-snap-align:center">
+            <div data-frame style="width:min(300px,72vw);transform-style:preserve-3d;will-change:transform">
+              <div style="padding:16px;border-radius:14px;background:linear-gradient(160deg,#1c1c1c,#0b0b0b);border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 80px rgba(0,0,0,.6)">
+                <div style="width:100%;height:340px;border-radius:6px;background-image:url('{{ p.img }}');background-size:cover;background-position:center;border:1px solid rgba(0,0,0,.5);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)"></div>
+              </div>
+              <div style="text-align:center;margin-top:18px">
+                <div style="font-size:15px;font-weight:600">{{ p.name }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:rgba(245,245,247,.5);margin-top:5px;text-transform:uppercase">{{ p.cat }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 03/05 FILTER + PORTFOLIO WALL -->
+    <section data-screen-label="Portfolio Wall" style="position:relative;padding:clamp(40px,6vh,80px) clamp(20px,6vw,90px) clamp(50px,7vh,100px);max-width:1440px;margin:0 auto">
+      <div data-reveal style="text-align:center;margin-bottom:40px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// Full Portfolio</div>
+        <h2 style="font-size:clamp(30px,4.6vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1">Explore Every Project</h2>
+      </div>
+      <div data-reveal style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:44px">
+        <sc-for list="{{ pfilters }}" as="chip" hint-placeholder-count="6">
+          <button data-cursor onClick="{{ chip.set }}" style="padding:10px 22px;border-radius:30px;border:1px solid {{ chip.border }};background:{{ chip.bg }};color:{{ chip.color }};font-size:14px;font-weight:500;transition:all .3s">{{ chip.label }}</button>
+        </sc-for>
+      </div>
+      <div data-r="gallery" style="column-count:3;column-gap:20px">
+        <sc-for list="{{ projectsFiltered }}" as="p" hint-placeholder-count="9">
+          <div data-reveal data-tilt data-cursor onClick="{{ p.open }}" style="break-inside:avoid;margin-bottom:20px;position:relative;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#0a0a0a;transition:border-color .4s,box-shadow .4s;transform-style:preserve-3d" style-hover="border-color:rgba(57,255,142,.4);box-shadow:0 30px 60px rgba(0,0,0,.5)">
+            <div style="width:100%;height:{{ p.h }};background-image:url('{{ p.img }}');background-size:cover;background-position:center;transition:transform .6s cubic-bezier(.16,1,.3,1)" style-hover="transform:scale(1.07)"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(5,5,5,.92));opacity:0;transition:opacity .4s;display:flex;flex-direction:column;justify-content:flex-end;padding:22px" style-hover="opacity:1">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#39ff8e;text-transform:uppercase;margin-bottom:8px">{{ p.cat }}</span>
+              <span style="font-size:18px;font-weight:600;line-height:1.15;margin-bottom:8px">{{ p.name }}</span>
+              <span style="font-size:12px;color:rgba(245,245,247,.6)">{{ p.industry }} · {{ p.tools }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- SOCIAL MEDIA PACKAGES -->
+    <section data-screen-label="Packages" style="position:relative;padding:clamp(40px,6vh,80px) clamp(20px,6vw,90px) clamp(40px,6vh,80px);max-width:1300px;margin:0 auto">
+      <div style="position:absolute;top:10%;left:50%;transform:translateX(-50%);width:72%;height:50%;background:radial-gradient(circle,rgba(57,255,142,.1),rgba(43,123,255,.05) 45%,transparent 70%);filter:blur(64px);pointer-events:none"></div>
+      <div data-reveal style="position:relative;text-align:center;margin-bottom:54px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// Pricing &amp; Plans</div>
+        <h2 style="font-size:clamp(32px,5vw,68px);font-weight:700;line-height:.98;letter-spacing:-.03em;margin-bottom:18px">Social Media Packages</h2>
+        <p style="font-size:clamp(15px,1.6vw,18px);line-height:1.7;color:rgba(245,245,247,.6);max-width:560px;margin:0 auto;text-wrap:pretty">Simple, transparent pricing — pick a plan and stay consistently visible online.</p>
+      </div>
+      <div data-r="pricegrid" style="position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch">
+        <sc-for list="{{ plans }}" as="plan" hint-placeholder-count="3">
+          <div data-reveal style="position:relative;display:flex">
+            <div data-tilt data-cursor style="position:relative;width:100%;display:flex;flex-direction:column;padding:38px 30px;border-radius:24px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(22px);box-shadow:0 30px 60px rgba(0,0,0,.4);transform-style:preserve-3d;transition:box-shadow .4s,border-color .4s" style-hover="box-shadow:0 44px 90px rgba(0,0,0,.55),0 0 60px rgba(57,255,142,.12);border-color:rgba(57,255,142,.35)">
+              <sc-if value="{{ plan.popular }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;inset:-1px;border-radius:24px;border:1.5px solid rgba(57,255,142,.55);box-shadow:0 0 60px rgba(57,255,142,.22);pointer-events:none"></div>
+                <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:30px;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;box-shadow:0 8px 26px rgba(57,255,142,.45);z-index:2">★ Most Popular</div>
+              </sc-if>
+              <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#39ff8e;margin-bottom:6px">{{ plan.name }}</div>
+                <div style="font-size:13px;color:rgba(245,245,247,.5);margin-bottom:24px">{{ plan.tagline }}</div>
+                <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:0 7px;margin-bottom:26px">
+                  <span data-countup="{{ plan.price }}" data-prefix="₹" style="font-size:clamp(32px,3.4vw,46px);font-weight:700;letter-spacing:-.02em;line-height:1.1;white-space:nowrap">₹0</span>
+                  <span style="font-size:14px;color:rgba(245,245,247,.5)">/ Month</span>
+                </div>
+                <div style="height:1px;background:rgba(255,255,255,.08);margin-bottom:24px"></div>
+                <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:32px">
+                  <sc-for list="{{ plan.features }}" as="f" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:flex-start;gap:12px;font-size:14px;line-height:1.45;color:rgba(245,245,247,.82)">
+                      <span style="flex-shrink:0;width:20px;height:20px;border-radius:50%;background:rgba(57,255,142,.14);color:#39ff8e;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px">✓</span><span style="flex:1;min-width:0">{{ f }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <button data-magnetic data-cursor onClick="{{ plan.go }}" style="margin-top:auto;padding:15px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:15px;font-weight:600" style-hover="border-color:rgba(57,255,142,.5);background:rgba(57,255,142,.1);color:#39ff8e">Contact Me</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-reveal style="position:relative;margin-top:80px">
+        <div style="text-align:center;margin-bottom:34px">
+          <h3 style="font-size:clamp(24px,3.2vw,40px);font-weight:700;letter-spacing:-.02em">Compare Plans</h3>
+        </div>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+          <div data-r="comptable" style="min-width:660px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);backdrop-filter:blur(16px)">
+            <div style="display:flex;flex-direction:column">
+              <div style="height:88px;display:flex;align-items:center;padding:0 26px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(245,245,247,.5);border-bottom:1px solid rgba(255,255,255,.08)">Features</div>
+              <sc-for list="{{ compare.features }}" as="feat" hint-placeholder-count="6">
+                <div style="height:62px;display:flex;align-items:center;padding:0 26px;font-size:14px;font-weight:500;border-bottom:1px solid rgba(255,255,255,.05)">{{ feat }}</div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ compare.cols }}" as="col" hint-placeholder-count="3">
+              <div style="position:relative;display:flex;flex-direction:column;text-align:center">
+                <sc-if value="{{ col.popular }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;inset:0;background:rgba(57,255,142,.045);border-left:1px solid rgba(57,255,142,.22);border-right:1px solid rgba(57,255,142,.22);pointer-events:none"></div>
+                </sc-if>
+                <div style="position:relative;height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-bottom:1px solid rgba(255,255,255,.08)">
+                  <span style="font-size:16px;font-weight:700">{{ col.name }}</span>
+                  <sc-if value="{{ col.popular }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#39ff8e">Popular</span></sc-if>
+                </div>
+                <sc-for list="{{ col.cells }}" as="cell" hint-placeholder-count="6">
+                  <div style="position:relative;height:62px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.05)">
+                    <sc-if value="{{ cell.yes }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;background:rgba(57,255,142,.14);color:#39ff8e;font-size:13px">✓</span></sc-if>
+                    <sc-if value="{{ cell.no }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;background:rgba(255,255,255,.04);color:rgba(245,245,247,.28);font-size:12px">✕</span></sc-if>
+                    <sc-if value="{{ cell.num }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;font-weight:600">{{ cell.num }}</span></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div data-reveal style="position:relative;margin-top:60px;text-align:center">
+        <h3 style="font-size:clamp(24px,3.2vw,42px);font-weight:700;letter-spacing:-.02em;margin-bottom:26px;text-wrap:balance">Ready to grow your social media presence?</h3>
+        <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:16px 36px;border-radius:40px;border:none;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:16px;font-weight:700;box-shadow:0 14px 42px rgba(43,123,255,.35)">Contact Me</button>
+      </div>
+    </section>
+
+  </div>
+  </sc-if>
+
+  <!-- ============ UI/UX PAGE ============ -->
+  <sc-if value="{{ isUiux }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="UI/UX" style="position:relative;z-index:10">
+    <div id="uiSpot" style="position:fixed;top:0;left:0;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(43,123,255,.13),transparent 60%);transform:translate(-50%,-50%);pointer-events:none;z-index:0;will-change:transform"></div>
+
+    <!-- 1 HERO -->
+    <section data-screen-label="UIUX Hero" style="position:relative;z-index:1;min-height:94vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:140px clamp(20px,6vw,90px) 40px;overflow:hidden">
+      <div data-parallax="-0.08" style="position:absolute;top:14%;right:8%;width:32vw;height:32vw;max-width:440px;border-radius:50%;background:radial-gradient(circle,rgba(57,255,142,.18),transparent 62%);filter:blur(48px);animation:blobMove 19s ease-in-out infinite;pointer-events:none"></div>
+      <div id="deviceFloat" style="position:absolute;inset:0;z-index:1;pointer-events:none">
+        <div data-poster style="position:absolute;top:15%;left:8%;width:150px;height:200px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 60px rgba(0,0,0,.5);background-image:url('assets/uiux/fashion-catch.jpg');background-size:cover;background-position:top;animation:floatA 8s ease-in-out infinite;opacity:.85"></div>
+        <div data-poster style="position:absolute;bottom:17%;right:8%;width:180px;height:126px;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 60px rgba(0,0,0,.5);background-image:url('assets/uiux/photography.jpg');background-size:cover;background-position:top;animation:floatB 10s ease-in-out infinite;opacity:.85"></div>
+        <div data-poster style="position:absolute;top:24%;right:14%;width:54px;height:54px;border-radius:16px;border:1px solid rgba(57,255,142,.3);background:rgba(57,255,142,.06);backdrop-filter:blur(8px);animation:floatA 7s ease-in-out infinite"></div>
+        <div data-poster style="position:absolute;bottom:26%;left:13%;width:46px;height:46px;border-radius:50%;border:1px solid rgba(43,123,255,.3);background:rgba(43,123,255,.06);backdrop-filter:blur(8px);animation:floatB 9s ease-in-out infinite"></div>
+      </div>
+      <div style="position:relative;z-index:2;text-align:center">
+        <div data-reveal style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:26px">Portfolio — Product Design</div>
+        <h1 data-reveal style="font-size:clamp(50px,11vw,170px);font-weight:700;line-height:.88;letter-spacing:-.04em;background:linear-gradient(90deg,#fff,#2b7bff,#39ff8e);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 7s linear infinite">UI/UX<br>DESIGNER</h1>
+        <p data-reveal style="margin:24px auto 0;font-size:clamp(18px,2.3vw,28px);font-weight:600;letter-spacing:-.01em;color:#f5f5f7">Designing Experiences That Users Love.</p>
+        <p data-reveal style="max-width:580px;margin:18px auto 0;font-size:clamp(15px,1.6vw,17px);line-height:1.7;color:rgba(245,245,247,.6);text-wrap:pretty">I create intuitive user experiences, modern interfaces, responsive websites, and visually engaging digital products that balance business goals with user needs.</p>
+        <div data-reveal style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px">
+          <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:15px 30px;border-radius:40px;border:none;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:15px;font-weight:700;box-shadow:0 12px 40px rgba(43,123,255,.4)">Hire Me</button>
+          <button data-magnetic data-cursor onClick="{{ goSocial }}" style="padding:15px 30px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:15px;font-weight:600" style-hover="background:rgba(255,255,255,.08)">Social Media Work</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 DESIGN PHILOSOPHY -->
+    <section data-screen-label="Process" style="position:relative;z-index:1;padding:clamp(60px,8vh,120px) clamp(20px,6vw,90px);max-width:1340px;margin:0 auto">
+      <div data-reveal style="margin-bottom:60px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 01 — Design Philosophy</div>
+        <h2 style="font-size:clamp(34px,5.4vw,76px);font-weight:700;line-height:.98;letter-spacing:-.03em">My Design Process</h2>
+      </div>
+      <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px">
+        <div style="position:absolute;top:34px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(43,123,255,.5),rgba(57,255,142,.5),transparent);z-index:0"></div>
+        <sc-for list="{{ uiProcess }}" as="s" hint-placeholder-count="5">
+          <div data-reveal data-cursor style="position:relative;z-index:1">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+              <span style="width:18px;height:18px;border-radius:50%;background:#050505;border:2px solid #39ff8e;box-shadow:0 0 18px rgba(57,255,142,.6);flex-shrink:0"></span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:#2b7bff;font-weight:500">{{ s.n }}</span>
+            </div>
+            <div style="padding:24px;border-radius:20px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px);min-height:150px;transition:transform .4s,border-color .4s" style-hover="transform:translateY(-6px);border-color:rgba(57,255,142,.3)">
+              <h3 style="font-size:18px;font-weight:600;margin-bottom:10px;letter-spacing:-.01em">{{ s.t }}</h3>
+              <p style="font-size:13px;line-height:1.6;color:rgba(245,245,247,.55)">{{ s.d }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 3 FEATURED CASE STUDIES -->
+    <section data-screen-label="UIUX Case Studies" style="position:relative;z-index:1;padding:clamp(40px,6vh,80px) clamp(20px,6vw,90px);max-width:1300px;margin:0 auto">
+      <div data-reveal style="margin-bottom:48px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 02 — Featured Case Studies</div>
+        <h2 style="font-size:clamp(34px,5.4vw,76px);font-weight:700;line-height:.98;letter-spacing:-.03em">Selected Work</h2>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:26px">
+        <sc-for list="{{ uiProjects }}" as="p" hint-placeholder-count="8">
+          <div data-reveal data-cursor onClick="{{ p.open }}" data-r="featcard" style="position:relative;display:grid;grid-template-columns:1fr 1.05fr;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);backdrop-filter:blur(16px);min-height:360px;transition:border-color .5s,transform .5s" style-hover="border-color:rgba(43,123,255,.4);transform:translateY(-6px)">
+            <div style="padding:clamp(30px,4vw,52px);display:flex;flex-direction:column;justify-content:center">
+              <div style="display:inline-flex;align-self:flex-start;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#2b7bff;margin-bottom:20px;padding:6px 14px;border-radius:30px;border:1px solid rgba(43,123,255,.3);background:rgba(43,123,255,.06)">{{ p.sub }}</div>
+              <h3 style="font-size:clamp(26px,3.2vw,42px);font-weight:700;line-height:1.04;letter-spacing:-.02em;margin-bottom:14px">{{ p.name }}</h3>
+              <p style="font-size:15px;line-height:1.7;color:rgba(245,245,247,.6);max-width:440px;margin-bottom:24px;text-wrap:pretty">{{ p.desc }}</p>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px">
+                <span style="padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:rgba(245,245,247,.6)">{{ p.role }}</span>
+                <span style="padding:6px 12px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:11px;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;color:rgba(245,245,247,.6)">{{ p.tools }}</span>
+              </div>
+              <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#fff">View case study →</span>
+            </div>
+            <div style="position:relative;overflow:hidden;min-height:300px;background:#0a0a0a">
+              <div style="position:absolute;inset:0;background-image:url('{{ p.img }}');background-size:cover;background-position:top center;transition:transform .7s cubic-bezier(.16,1,.3,1)" style-hover="transform:scale(1.05)"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.55),transparent 32%)"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 4 DEVICE SHOWCASE -->
+    <section data-screen-label="Device Showcase" style="position:relative;z-index:1;padding:clamp(50px,7vh,100px) clamp(20px,6vw,90px);max-width:1300px;margin:0 auto">
+      <div data-reveal style="text-align:center;margin-bottom:60px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 03 — Across every screen</div>
+        <h2 style="font-size:clamp(32px,5vw,68px);font-weight:700;letter-spacing:-.03em;line-height:1">Pixel-perfect, device-ready</h2>
+      </div>
+      <div data-reveal data-r="devrow" style="display:flex;align-items:center;justify-content:center;gap:clamp(20px,4vw,60px);perspective:1600px">
+        <div data-rotate="-14" style="position:relative;animation:floatA 9s ease-in-out infinite">
+          <div style="width:160px;height:330px;border-radius:34px;border:7px solid #161616;background:#0a0a0a;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 60px rgba(43,123,255,.15);overflow:hidden;position:relative">
+            <div style="position:absolute;top:9px;left:50%;transform:translateX(-50%);width:46px;height:6px;border-radius:6px;background:#222;z-index:2"></div>
+            <div style="position:absolute;inset:0;background-image:url('assets/uiux/project.jpg');background-size:cover;background-position:top center"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 70%,rgba(5,5,5,.5))"></div>
+          </div>
+          <div style="text-align:center;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:rgba(245,245,247,.5);text-transform:uppercase">iPhone</div>
+        </div>
+        <div data-rotate="6" style="position:relative;z-index:2;animation:floatB 11s ease-in-out infinite">
+          <div style="width:clamp(300px,42vw,460px);height:clamp(195px,27vw,300px);border-radius:16px;border:11px solid #161616;background:#0a0a0a;box-shadow:0 50px 110px rgba(0,0,0,.7),0 0 80px rgba(57,255,142,.14);overflow:hidden;position:relative">
+            <div style="position:absolute;inset:0;background-image:url('assets/uiux/fashion-catch.jpg');background-size:cover;background-position:top center"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 72%,rgba(5,5,5,.4))"></div>
+          </div>
+          <div style="margin:14px auto 0;width:90px;height:8px;border-radius:0 0 10px 10px;background:#161616"></div>
+          <div style="text-align:center;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:rgba(245,245,247,.5);text-transform:uppercase">MacBook</div>
+        </div>
+        <div data-rotate="14" style="position:relative;animation:floatA 10s ease-in-out infinite">
+          <div style="width:210px;height:285px;border-radius:22px;border:9px solid #161616;background:#0a0a0a;box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 60px rgba(57,255,142,.14);overflow:hidden;position:relative">
+            <div style="position:absolute;inset:0;background-image:url('assets/uiux/flower.jpg');background-size:cover;background-position:top center"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 72%,rgba(5,5,5,.45))"></div>
+          </div>
+          <div style="text-align:center;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;color:rgba(245,245,247,.5);text-transform:uppercase">Tablet</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 UI SHOWCASE WALL -->
+    <section data-screen-label="UI Wall" style="position:relative;z-index:1;padding:clamp(40px,6vh,80px) clamp(20px,6vw,90px);max-width:1440px;margin:0 auto">
+      <div data-reveal style="text-align:center;margin-bottom:44px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 04 — UI Showcase Wall</div>
+        <h2 style="font-size:clamp(30px,4.6vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1">Every Screen, Up Close</h2>
+      </div>
+      <div data-r="gallery" style="column-count:3;column-gap:20px">
+        <sc-for list="{{ uiProjects }}" as="p" hint-placeholder-count="8">
+          <div data-reveal data-tilt data-cursor onClick="{{ p.open }}" style="break-inside:avoid;margin-bottom:20px;position:relative;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#0a0a0a;transition:border-color .4s,box-shadow .4s;transform-style:preserve-3d" style-hover="border-color:rgba(57,255,142,.4);box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 50px rgba(57,255,142,.12)">
+            <div style="width:100%;height:{{ p.h }};background-image:url('{{ p.img }}');background-size:cover;background-position:top center;transition:transform .6s cubic-bezier(.16,1,.3,1)" style-hover="transform:scale(1.07)"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(5,5,5,.92));opacity:0;transition:opacity .4s;display:flex;flex-direction:column;justify-content:flex-end;padding:22px" style-hover="opacity:1">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#39ff8e;text-transform:uppercase;margin-bottom:8px">{{ p.sub }}</span>
+              <span style="font-size:19px;font-weight:600;line-height:1.15;margin-bottom:6px">{{ p.name }}</span>
+              <span style="font-size:12px;color:rgba(245,245,247,.6)">{{ p.tools }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 6 BEFORE & AFTER DESIGN THINKING -->
+    <section data-screen-label="Design Thinking" style="position:relative;z-index:1;padding:clamp(50px,7vh,100px) clamp(20px,6vw,90px);max-width:1340px;margin:0 auto">
+      <div data-reveal style="text-align:center;margin-bottom:54px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 05 — How I Think</div>
+        <h2 style="font-size:clamp(30px,4.6vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1">From Problem to Polished</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
+        <sc-for list="{{ beforeAfter }}" as="b" hint-placeholder-count="4">
+          <div data-reveal data-tilt data-cursor style="position:relative;padding:34px 28px;border-radius:22px;background:linear-gradient(160deg,rgba(43,123,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px);min-height:230px;transform-style:preserve-3d;transition:border-color .4s,box-shadow .4s" style-hover="border-color:rgba(57,255,142,.35);box-shadow:0 30px 60px rgba(0,0,0,.5)">
+            <div style="font-size:54px;font-weight:700;letter-spacing:-.03em;line-height:1;color:rgba(255,255,255,.07);margin-bottom:14px">{{ b.n }}</div>
+            <h3 style="font-size:21px;font-weight:600;margin-bottom:12px;letter-spacing:-.01em">{{ b.t }}</h3>
+            <p style="font-size:14px;line-height:1.65;color:rgba(245,245,247,.58)">{{ b.d }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 7 TOOLS & SKILLS -->
+    <section data-screen-label="Skills" style="position:relative;z-index:1;padding:clamp(50px,7vh,100px) clamp(20px,6vw,90px);max-width:1100px;margin:0 auto;text-align:center">
+      <div data-reveal style="margin-bottom:44px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 06 — Tools & Skills</div>
+        <h2 style="font-size:clamp(30px,4.6vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1">What I Work With</h2>
+      </div>
+      <div data-reveal style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
+        <sc-for list="{{ uiSkills }}" as="sk" hint-placeholder-count="9">
+          <div data-tilt data-cursor style="padding:16px 26px;border-radius:40px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(14px);font-size:15px;font-weight:500;transform-style:preserve-3d;transition:border-color .35s,background .35s,box-shadow .35s" style-hover="border-color:rgba(57,255,142,.45);background:rgba(57,255,142,.07);box-shadow:0 12px 34px rgba(0,0,0,.4),0 0 40px rgba(57,255,142,.12)">{{ sk }}</div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 8 PROJECT STATISTICS -->
+    <section data-screen-label="UIUX Stats" style="position:relative;z-index:1;padding:clamp(40px,6vh,80px) clamp(20px,6vw,90px);max-width:1100px;margin:0 auto">
+      <div data-reveal data-r="statgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">
+        <sc-for list="{{ uiStats }}" as="s" hint-placeholder-count="4">
+          <div style="text-align:center;padding:34px 14px;border-radius:22px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px)">
+            <span data-countup="{{ s.n }}" data-suffix="{{ s.suffix }}" style="display:inline-block;font-size:clamp(34px,4.4vw,58px);font-weight:700;letter-spacing:-.03em;line-height:1;background:linear-gradient(90deg,#2b7bff,#39ff8e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">0</span>
+            <div style="margin-top:10px;font-size:13px;color:rgba(245,245,247,.62)">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 9 3D PROJECT GALLERY -->
+    <section data-screen-label="3D Project Gallery" style="position:relative;z-index:1;padding:clamp(50px,7vh,100px) 0;overflow:hidden">
+      <div data-reveal style="text-align:center;padding:0 clamp(20px,6vw,90px);margin-bottom:30px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 07 — Gallery</div>
+        <h2 style="font-size:clamp(30px,4.6vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1">Floating Canvases</h2>
+        <p style="font-size:13px;color:rgba(245,245,247,.5);margin-top:14px;font-family:'JetBrains Mono',monospace;letter-spacing:.1em">— drag / swipe to explore —</p>
+      </div>
+      <div id="frameStrip" style="display:flex;gap:34px;overflow-x:auto;overflow-y:hidden;padding:50px clamp(40px,12vw,180px);perspective:1500px;scroll-snap-type:x proximity">
+        <sc-for list="{{ uiProjects }}" as="p" hint-placeholder-count="6">
+          <div data-cursor onClick="{{ p.open }}" style="flex:0 0 auto;scroll-snap-align:center">
+            <div data-frame style="width:min(320px,74vw);transform-style:preserve-3d;will-change:transform">
+              <div style="padding:14px;border-radius:14px;background:linear-gradient(160deg,#1c1c1c,#0b0b0b);border:1px solid rgba(255,255,255,.1);box-shadow:0 40px 80px rgba(0,0,0,.6)">
+                <div style="width:100%;height:360px;border-radius:6px;background-image:url('{{ p.img }}');background-size:cover;background-position:top center;border:1px solid rgba(0,0,0,.5)"></div>
+              </div>
+              <div style="text-align:center;margin-top:18px">
+                <div style="font-size:15px;font-weight:600">{{ p.name }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;color:rgba(245,245,247,.5);margin-top:5px;text-transform:uppercase">{{ p.sub }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 10 WHY WORK WITH ME -->
+    <section data-screen-label="Why Me" style="position:relative;z-index:1;padding:clamp(50px,7vh,100px) clamp(20px,6vw,90px);max-width:1300px;margin:0 auto">
+      <div data-reveal style="margin-bottom:54px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:16px">// 08 — Why Work With Me</div>
+        <h2 style="font-size:clamp(34px,5.4vw,76px);font-weight:700;line-height:.98;letter-spacing:-.03em">Built Around You</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+        <sc-for list="{{ whyCards }}" as="c" hint-placeholder-count="6">
+          <div data-reveal data-tilt data-cursor style="position:relative;padding:34px 30px;border-radius:24px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(20px);min-height:200px;transform-style:preserve-3d;transition:border-color .4s,box-shadow .4s" style-hover="border-color:rgba(43,123,255,.4);box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 50px rgba(43,123,255,.12)">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(43,123,255,.25),rgba(57,255,142,.18));border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px;transform:translateZ(30px)">{{ c.icon }}</div>
+            <h3 style="font-size:20px;font-weight:600;margin-bottom:10px;letter-spacing:-.01em">{{ c.t }}</h3>
+            <p style="font-size:14px;line-height:1.6;color:rgba(245,245,247,.55)">{{ c.d }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- 11 CONTACT CTA -->
+    <section data-screen-label="UIUX Contact" style="position:relative;z-index:1;padding:clamp(60px,8vh,130px) clamp(20px,6vw,90px) 110px;max-width:1100px;margin:0 auto">
+      <div data-reveal style="position:relative;border-radius:36px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);backdrop-filter:blur(24px);padding:clamp(40px,6vw,80px);text-align:center">
+        <div style="position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:80%;height:120%;background:radial-gradient(circle,rgba(43,123,255,.22),transparent 60%);filter:blur(50px);pointer-events:none"></div>
+        <div style="position:relative;z-index:1">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:#39ff8e;margin-bottom:20px">// Let's collaborate</div>
+          <h2 style="font-size:clamp(32px,5.4vw,72px);font-weight:700;line-height:1.02;letter-spacing:-.03em;margin-bottom:30px;text-wrap:balance">Let's Build Something<br>Amazing <span style="background:linear-gradient(90deg,#2b7bff,#39ff8e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent">Together</span></h2>
+          <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+            <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:16px 34px;border-radius:40px;border:none;background:linear-gradient(135deg,#2b7bff,#39ff8e);color:#050505;font-size:16px;font-weight:700;box-shadow:0 14px 42px rgba(43,123,255,.4)">Hire Me</button>
+            <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:16px 34px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:16px;font-weight:600" style-hover="border-color:rgba(57,255,142,.45);color:#39ff8e">View Resume</button>
+            <button data-magnetic data-cursor onClick="{{ goContact }}" style="padding:16px 34px;border-radius:40px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#f5f5f7;font-size:16px;font-weight:600" style-hover="border-color:rgba(43,123,255,.45);color:#2b7bff">Download Portfolio</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- FOOTER -->
+  <footer style="position:relative;z-index:10;padding:50px clamp(20px,6vw,90px);border-top:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#2b7bff,#39ff8e);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#050505">SP</span>
+      <span style="font-size:14px;color:rgba(245,245,247,.6)">© 2026 Shivani Patidar. All Rights Reserved.</span>
+    </div>
+    <div style="display:flex;gap:24px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;color:rgba(245,245,247,.45)">
+      <button data-cursor onClick="{{ goHome }}" style="background:none;border:none;color:inherit" style-hover="color:#39ff8e">Home</button>
+      <button data-cursor onClick="{{ goSocial }}" style="background:none;border:none;color:inherit" style-hover="color:#39ff8e">Social</button>
+      <button data-cursor onClick="{{ goUiux }}" style="background:none;border:none;color:inherit" style-hover="color:#39ff8e">UI/UX</button>
+    </div>
+  </footer>
+
+  <!-- LIGHTBOX / CASE MODAL -->
+  <sc-if value="{{ lightbox }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeLightbox }}" style="position:fixed;inset:0;z-index:8000;background:rgba(5,5,5,.82);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vw,60px);overflow-y:auto">
+    <div onClick="{{ stop }}" style="position:relative;width:100%;max-width:980px;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.12);background:#0a0a0a;box-shadow:0 60px 140px rgba(0,0,0,.8);display:grid;grid-template-columns:1fr 1fr;min-height:460px;cursor:none">
+      <button data-cursor onClick="{{ closeLightbox }}" style="position:absolute;top:18px;right:18px;z-index:3;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(5,5,5,.6);backdrop-filter:blur(10px);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center">✕</button>
+      <div style="position:relative;min-height:300px;background:{{ lightbox.grad }}">
+        <sc-if value="{{ lightbox.img }}" hint-placeholder-val="{{ false }}">
+          <div style="width:100%;height:100%;min-height:300px;background-image:url('{{ lightbox.img }}');background-size:cover;background-position:center"></div>
+        </sc-if>
+        <sc-if value="{{ lightbox.noImg }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.04) 0,rgba(255,255,255,.04) 1px,transparent 1px,transparent 12px)"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:rgba(255,255,255,.4);text-transform:uppercase;text-align:center">{{ lightbox.name }}<br>[ design preview ]</span></div>
+        </sc-if>
+      </div>
+      <div style="padding:clamp(28px,4vw,46px);display:flex;flex-direction:column;justify-content:center;max-height:84vh;overflow-y:auto">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#39ff8e;margin-bottom:14px">{{ lightbox.cat }}</div>
+        <h3 style="font-size:clamp(24px,3.2vw,38px);font-weight:700;line-height:1.04;letter-spacing:-.02em;margin-bottom:22px">{{ lightbox.name }}</h3>
+        <div style="display:flex;flex-direction:column;gap:13px;margin-bottom:24px">
+          <sc-for list="{{ lightbox.meta }}" as="m" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;gap:16px;padding-bottom:13px;border-bottom:1px solid rgba(255,255,255,.08)"><span style="flex-shrink:0;font-size:12px;color:rgba(245,245,247,.45);font-family:'JetBrains Mono',monospace;letter-spacing:.06em">{{ m.k }}</span><span style="font-size:14px;font-weight:500;text-align:right">{{ m.v }}</span></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ lightbox.objective }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:20px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#2b7bff;margin-bottom:8px">Objective</div>
+            <p style="font-size:15px;line-height:1.65;color:rgba(245,245,247,.78)">{{ lightbox.objective }}</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{ lightbox.overview }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#39ff8e;margin-bottom:8px">Project Overview</div>
+            <p style="font-size:15px;line-height:1.7;color:rgba(245,245,247,.62);text-wrap:pretty;white-space:pre-line">{{ lightbox.overview }}</p>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  state = { currentPage: 'home', galleryCat: 'All', projectCat: 'All', lightbox: null, sendState: 0 };
+
+  renderVals() {
+    const st = this.state || {};
+    const page = st.currentPage || 'home';
+    const galleryCat = st.galleryCat || 'All';
+    const sendStateVal = st.sendState || 0;
+    const go = (p) => () => {
+      this.setState({ currentPage: p, lightbox: null });
+      requestAnimationFrame(() => {
+        if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
+        else window.scrollTo(0, 0);
+        setTimeout(() => this._collect && this._collect(), 60);
+      });
+    };
+    const scrollTo = (id) => () => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (window.__lenis) window.__lenis.scrollTo(el, { offset: -30 });
+      else window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 30, behavior: 'smooth' });
+    };
+
+    const blue = 'rgba(43,123,255,', green = 'rgba(57,255,142,';
+    const grad = (h) => `linear-gradient(150deg,${h}.22),rgba(255,255,255,.02))`;
+
+    const galleryRaw = [
+      { cat: 'Festival', name: 'Explore Ujjain', client: 'Tourism Campaign', tools: 'Photoshop, Illustrator', overview: 'A heritage travel map turning Ujjain\u2019s temples, ghats and local food into a single illustrated guide \u2014 built to be shared and saved across social platforms.', img: 'assets/project-ujjain.jpg', h: '520px' },
+      { cat: 'Food', name: 'Poha Jalebi Combo', client: 'Local Cafe', tools: 'Photoshop', overview: 'A mouth-watering breakfast promo blending warm tones and bold typography to make a regional classic feel premium.', h: '380px' },
+      { cat: 'Jewellery', name: 'Golden Hour', client: 'Aabha Jewels', tools: 'Photoshop, Lightroom', overview: 'A luxe festive collection teaser \u2014 deep blacks, gold light and minimal copy to let the product shine.', h: '460px' },
+      { cat: 'Corporate', name: 'Quarterly Report', client: 'FinEdge', tools: 'Figma, Illustrator', overview: 'Clean data storytelling for a fintech update \u2014 charts, highlights and a confident grid system.', h: '340px' },
+      { cat: 'Real Estate', name: 'Skyline Homes', client: 'Nirvana Realty', tools: 'Photoshop', overview: 'An aspirational property launch creative with architectural lines and a calm, trustworthy palette.', h: '500px' },
+      { cat: 'Business', name: 'Launch Teaser', client: 'GigaWebZone', tools: 'Figma', overview: 'A countdown reveal series for a product launch \u2014 motion-ready frames and a punchy accent system.', h: '360px' },
+      { cat: 'Festival', name: 'Diwali Greetings', client: 'Retail Brand', tools: 'Photoshop', overview: 'A glowing festival wish post pairing diyas, depth and a celebratory gradient to drive seasonal reach.', h: '420px' },
+      { cat: 'Food', name: 'Street Bites', client: 'Foodie Co.', tools: 'Illustrator', overview: 'A playful street-food menu series \u2014 hand-drawn energy meets a structured, scroll-friendly layout.', h: '470px' },
+      { cat: 'Jewellery', name: 'Heritage Set', client: 'Shree Ornaments', tools: 'Photoshop', overview: 'A traditional bridal collection spotlight with rich texture and elegant, restrained typography.', h: '340px' }
+    ];
+    const catColors = { Festival: green, Food: blue, Jewellery: green, Corporate: blue, 'Real Estate': green, Business: blue, All: blue };
+    const gallery = galleryRaw.map((g, i) => {
+      const h = catColors[g.cat] || blue;
+      const item = { ...g, noImg: !g.img, grad: grad(h) };
+      item.open = () => this.setState({ lightbox: item });
+      return item;
+    });
+    const galleryFiltered = galleryCat === 'All' ? gallery : gallery.filter(g => g.cat === galleryCat);
+
+    const cats = ['All', 'Festival', 'Corporate', 'Food', 'Real Estate', 'Jewellery', 'Business'];
+    const catChips = cats.map(c => {
+      const active = galleryCat === c;
+      return {
+        label: c,
+        set: () => this.setState({ galleryCat: c }),
+        bg: active ? 'rgba(57,255,142,.12)' : 'rgba(255,255,255,.03)',
+        border: active ? 'rgba(57,255,142,.5)' : 'rgba(255,255,255,.1)',
+        color: active ? '#39ff8e' : 'rgba(245,245,247,.7)'
+      };
+    });
+
+    const casesRaw = [
+      { tag: 'Travel \u2014 Mobile App', name: 'Explore Ujjain \u2014 Pilgrim\u2019s Travel Guide', overview: 'A guided travel companion that maps Ujjain\u2019s sacred sites, timings and local food into one calm, easy-to-follow journey.', img: 'assets/project-ujjain.jpg', h: blue,
+        problem: 'First-time pilgrims juggle scattered info \u2014 temple timings, routes, and local food \u2014 across blogs and chats, making trips stressful to plan.',
+        research: 'Interviewed 8 recent visitors and audited 5 travel apps. Key insight: people want a curated route, not an endless list \u2014 trust and sequence matter more than volume.',
+        wireframes: 'Low-fi flows for discovery \u2192 itinerary \u2192 on-the-ground navigation, validated with a quick clickable prototype before any visual polish.',
+        ui: 'A warm, map-first interface with large imagery, clear hierarchy and a sticky \u201cnext stop\u201d card so users always know where to go next.',
+        solution: 'A shareable, save-friendly guide that cut planning time dramatically in testing and made the experience feel guided rather than overwhelming.' },
+      { tag: 'Fintech \u2014 Web App', name: 'FinEdge \u2014 Analytics Dashboard', overview: 'A data-dense fintech dashboard rebuilt around clarity \u2014 turning raw numbers into decisions in a single glance.',
+        problem: 'Users drowned in tables and could not spot what changed week to week, leading to missed signals and slow decisions.',
+        research: 'Card-sorting and 6 user sessions revealed the top 3 metrics that actually drive action \u2014 everything else was noise to surface on demand.',
+        wireframes: 'Modular grid with a priority \u201chero metric\u201d row, progressive disclosure for detail, and responsive breakpoints planned from the start.',
+        ui: 'A focused dark UI with a restrained accent system, accessible contrast and motion used only to draw the eye to change.',
+        solution: 'A dashboard that puts the three numbers that matter up top \u2014 testers reported faster comprehension and far less scrolling.' },
+      { tag: 'Wellness \u2014 Mobile App', name: 'Bloom \u2014 Daily Wellness', overview: 'A gentle habit app that makes showing up every day feel rewarding instead of like another chore.',
+        problem: 'Wellness apps over-notify and over-gamify, causing guilt and churn instead of consistency.',
+        research: 'Diary study with 10 users showed streak pressure backfires \u2014 people wanted encouragement and flexibility, not punishment for missing a day.',
+        wireframes: 'A calm home with one clear focus per day, optional depth, and a forgiving \u201cgrace\u201d mechanic instead of breakable streaks.',
+        ui: 'Soft gradients, rounded forms and tactile micro-interactions that make small wins feel celebrated.',
+        solution: 'A kinder daily loop that improved repeat-visit intent in concept testing by leading with empathy, not pressure.' }
+    ];
+    const cases = casesRaw.map(c => {
+      const item = { ...c, noImg: !c.img, grad: grad(c.h), stages: ['Overview', 'Problem', 'Research', 'Wireframes', 'UI Design', 'Final Solution'] };
+      item.open = () => this.setState({
+        lightbox: {
+          cat: c.tag, name: c.name,
+          meta: [{ k: 'TYPE', v: 'UI/UX Case Study' }, { k: 'TOOLS', v: 'Figma, Illustrator, Photoshop' }],
+          img: c.img, noImg: !c.img, grad: grad(c.h),
+          overview: `PROBLEM \u2014 ${c.problem}\n\nRESEARCH \u2014 ${c.research}\n\nWIREFRAMES \u2014 ${c.wireframes}\n\nUI DESIGN \u2014 ${c.ui}\n\nFINAL SOLUTION \u2014 ${c.solution}`
+        }
+      });
+      return item;
+    });
+
+    const plans = [
+      { name: 'Starter Plan', price: 1500, popular: false, tagline: 'Stay consistent online', features: ['10 Custom Social Media Posts', 'Festival Post Included', 'Basic Graphic Design', 'Professional Content Layout', 'WhatsApp Support'], go: (page === 'home' ? scrollTo('contact') : go('home')) },
+      { name: 'Growth Plan', price: 3000, popular: true, tagline: 'Build a recognisable brand', features: ['20 Custom Social Media Posts', 'Festival Post Included', 'Creative Design Concepts', 'Brand Consistent Designs', 'Priority Support'], go: (page === 'home' ? scrollTo('contact') : go('home')) },
+      { name: 'Business Plan', price: 5000, popular: false, tagline: 'Hands-off, fully managed', features: ['Complete Social Media Handling', '20+ Custom Posts', 'Festival Posts Included', 'Content Posting & Scheduling', 'Account Management', 'Creative Strategy Support'], go: (page === 'home' ? scrollTo('contact') : go('home')) }
+    ];
+
+    const Y = { yes: true }, N = { no: true };
+    const compare = {
+      features: ['Posts / Month', 'Festival Posts', 'Custom Graphics', 'Content Posting', 'Account Management', 'Priority Support'],
+      cols: [
+        { name: 'Starter', popular: false, cells: [{ num: '10' }, Y, Y, N, N, N] },
+        { name: 'Growth', popular: true, cells: [{ num: '20' }, Y, Y, N, N, Y] },
+        { name: 'Business', popular: false, cells: [{ num: '20+' }, Y, Y, Y, Y, Y] }
+      ]
+    };
+
+    const projectCat = st.projectCat || 'All';
+    const projectsRaw = [
+      { name: 'Mahakal Ujjain — Heritage Stamp', client: 'Heritage Series', cat: 'Festivals', type: 'Creative Heritage Poster', featTag: 'Creative Heritage Poster', industry: 'Tourism & Heritage', objective: 'Reimagine Ujjain\u2019s Mahakaleshwar Jyotirlinga as a collectible postage-stamp concept that celebrates the city of Mahakaal.', style: 'Vintage philately meets modern blue duotone', tools: 'Photoshop, Illustrator', img: 'assets/proj-ujjain-stamp.png', h: '470px', featured: true,
+        desc: 'A commemorative \u201cIndia Post\u201d stamp concept for the Shri Mahakaleshwar Jyotirlinga \u2014 pairing a duotone temple photograph with authentic perforated edges, postmark detailing and refined typography to turn a sacred landmark into a piece of collectible design.' },
+      { name: 'PET-TEP — Vaccination Campaign', client: 'PET-TEP Clinic & Grooming Centre', cat: 'Healthcare', type: 'Veterinary Clinic Marketing', featTag: 'Veterinary Clinic Marketing', industry: 'Veterinary Healthcare', objective: 'Drive vaccination bookings with an emotional, trust-building visual that positions the clinic as caring and professional.', style: 'Warm editorial, window-frame storytelling', tools: 'Photoshop', img: 'assets/proj-pettep-vaccine.png', h: '430px', featured: true,
+        desc: 'A preventive-care campaign built around a heartfelt window-frame scene \u2014 a vet, a dog and a cat \u2014 with the tagline \u201cProtect Today. Prevent Tomorrow.\u201d The warm palette and clear call-to-action make a medical message feel human and inviting.' },
+      { name: 'PET-TEP — Services Showcase', client: 'PET-TEP Clinic & Grooming Centre', cat: 'Healthcare', type: 'Service Menu Poster', industry: 'Veterinary Healthcare', objective: 'Communicate the full range of clinic services at a single glance for new pet parents.', style: 'Clean icon-led infographic', tools: 'Photoshop, Illustrator', img: 'assets/proj-pettep-care.png', h: '440px', featured: false,
+        desc: 'A friendly services poster mapping treatment, grooming, vaccination, diagnostics and surgery around a central hero image \u2014 organised with custom icons and a calm cream palette so families instantly understand what the clinic offers.' },
+      { name: 'PET-TEP — Coming Soon Teaser', client: 'PET-TEP Clinic & Grooming Centre', cat: 'Healthcare', type: 'Pre-launch Story Creative', industry: 'Veterinary Healthcare', objective: 'Build pre-launch buzz and announce the clinic opening across social stories.', style: 'Playful illustrated teaser', tools: 'Photoshop, Illustrator', img: 'assets/proj-pettep-soon1.png', h: '500px', featured: false,
+        desc: 'A vertical \u201cComing Soon\u201d story creative with an illustrated dog-and-cat duo under a glowing bulb \u2014 cheerful, on-brand and optimised for Instagram and WhatsApp status to create anticipation before launch.' },
+      { name: 'PET-TEP — Grand Opening', client: 'PET-TEP Clinic & Grooming Centre', cat: 'Healthcare', type: 'Launch Announcement', industry: 'Veterinary Healthcare', objective: 'Announce the launch with a premium, credible feel and surface the founding veterinarian.', style: 'Premium dark, photographic', tools: 'Photoshop', img: 'assets/proj-pettep-soon2.png', h: '440px', featured: false,
+        desc: 'A richer, photographic \u201cComing Soon\u201d announcement featuring the service list, doctor credentials and contact details against a moody brown gradient \u2014 elevating a local clinic launch to an agency-grade reveal.' },
+      { name: 'GigaBizZone — Pre-Launch Reveal', client: 'GigaBizZone', cat: 'Technology', type: 'AI Automation Agency Campaign', featTag: 'AI Automation Agency Campaign', industry: 'AI / SaaS', objective: 'Introduce an AI growth agency with a futuristic, high-trust launch creative aimed at Indian SMBs.', style: 'Futuristic dashboard hero, electric-blue', tools: 'Photoshop, Illustrator', img: 'assets/proj-gigabiz-prelaunch.png', h: '320px', featured: true,
+        desc: 'A pre-launch hero for an AI automation agency \u2014 a founder facing a holographic analytics dashboard with leads, revenue and time-saved metrics. Cinematic depth and a launch date turn a service pitch into an event.' },
+      { name: 'GigaBizZone — Thought Leadership', client: 'GigaBizZone', cat: 'Technology', type: 'Brand Awareness Post', industry: 'AI / SaaS', objective: 'Position the brand as the systems authority for growing businesses.', style: 'Dark cinematic with arrow-doorway concept', tools: 'Photoshop', img: 'assets/proj-gigabiz-quote.png', h: '320px', featured: false,
+        desc: 'A bold quote post \u2014 \u201cA business that doesn\u2019t systematize today will struggle tomorrow\u201d \u2014 paired with an arrow-shaped doorway opening onto a skyline. Strong typographic hierarchy and pillar icons make the idea instantly shareable.' },
+      { name: 'Industrial Band Saw — Spec Sheet', client: 'Kamal Patidar Industries', cat: 'Industrial', type: 'Technical Product Visualization', featTag: 'Technical Product Visualization', industry: 'Manufacturing', objective: 'Present complex machine specifications clearly and credibly for B2B buyers.', style: 'Technical infographic with callout cards', tools: 'Illustrator, Photoshop', img: 'assets/proj-bandsaw.jpg', h: '230px', featured: true,
+        desc: 'A precision spec sheet for a double-column band saw \u2014 a rendered machine annotated with dimensions, cutting capacity, speed, power and angle range. Engineering detail organised into clean, scannable callout cards for industrial decision-makers.' },
+      { name: 'Sharadey — Free Counselling', client: 'Sharadey Consultants', cat: 'Education', type: 'Education & Study Abroad Campaign', featTag: 'Education & Study Abroad Campaign', industry: 'Overseas Education', objective: 'Generate qualified counselling leads from study-abroad aspirants and their families.', style: 'Bright, trustworthy, flag-led', tools: 'Photoshop', img: 'assets/proj-sharadey-counselling.jpg', h: '320px', featured: true,
+        desc: 'A lead-generation creative offering free study-abroad counselling \u2014 destination flags, benefit checklist and a friendly counsellor portrait build instant trust, while a clear contact bar turns interest into enquiries.' },
+      { name: 'Sharadey — Success Gallery', client: 'Sharadey Consultants', cat: 'Education', type: 'Social Proof Campaign', industry: 'Overseas Education', objective: 'Use real student success as social proof to drive new admissions.', style: 'Dark premium testimonial', tools: 'Photoshop', img: 'assets/proj-sharadey-success.jpg', h: '320px', featured: false,
+        desc: 'A \u201cGallery of Smiles\u201d testimonial post showcasing admitted students holding their offer letters \u2014 a curved \u201cReal students. Real success.\u201d ribbon and destination flags make achievement aspirational and believable.' }
+    ];
+    const projects = projectsRaw.map(p => {
+      const item = { ...p };
+      item.open = () => this.setState({ lightbox: { cat: p.type, name: p.name, img: p.img, noImg: false, grad: grad(blue), meta: [{ k: 'CLIENT', v: p.client }, { k: 'INDUSTRY', v: p.industry }, { k: 'DESIGN STYLE', v: p.style }, { k: 'TOOLS', v: p.tools }], objective: p.objective, overview: p.desc } });
+      return item;
+    });
+    const projectsFiltered = projectCat === 'All' ? projects : projects.filter(p => p.cat === projectCat);
+    const pfcats = ['All'].concat(Array.from(new Set(projects.map(p => p.cat))));
+    const pfilters = pfcats.map(c => {
+      const active = projectCat === c;
+      return { label: c, set: () => this.setState({ projectCat: c }), bg: active ? 'rgba(57,255,142,.12)' : 'rgba(255,255,255,.03)', border: active ? 'rgba(57,255,142,.5)' : 'rgba(255,255,255,.1)', color: active ? '#39ff8e' : 'rgba(245,245,247,.7)' };
+    });
+    const featured = projects.filter(p => p.featured);
+    const stats = [{ n: 50, suffix: '+', label: 'Designs Created' }, { n: 10, suffix: '+', label: 'Industries Served' }, { n: 100, suffix: '%', label: 'Custom Design Approach' }];
+
+    const uiRaw = [
+      { name: 'Fashion Catch', sub: 'Fashion Website Design', role: 'UI/UX & Web Designer', tools: 'Figma, Photoshop, WordPress', img: 'assets/uiux/fashion-catch.jpg', h: '320px',
+        desc: 'An editorial fashion storefront where photography leads and the interface gets out of the way \u2014 built to make browsing a collection feel like flipping through a magazine.',
+        features: ['Full-bleed editorial hero', 'Lookbook-style gallery', 'Responsive product catalog'],
+        challenge: 'Make a content-heavy fashion brand feel effortless, premium and fast to shop.', solution: 'A restrained type system, generous whitespace and a confident grid that lets imagery breathe.', results: 'A distinctive brand presence that turns casual browsing into genuine engagement.' },
+      { name: 'Style Fusion', sub: 'Luxury Fashion Experience', role: 'UI/UX Designer', tools: 'Figma, Photoshop', img: 'assets/uiux/style-fusion.jpg', h: '300px',
+        desc: 'A luxury ethnic-wear experience pairing soft, tactile tones with elegant typography to position the label as timeless yet contemporary.',
+        features: ['Hero spotlight product', 'Soft layered section transitions', '\u201cWhy choose us\u201d trust blocks'],
+        challenge: 'Communicate craftsmanship and exclusivity without feeling heavy.', solution: 'A muted, sophisticated palette and wave-shaped section breaks that add motion and depth.', results: 'A premium feel that elevates perceived brand value at first glance.' },
+      { name: 'Grocery Store', sub: 'E-Commerce UI Design', role: 'UI/UX Designer', tools: 'Figma', img: 'assets/uiux/project.jpg', h: '300px',
+        desc: 'A friendly grocery e-commerce interface designed around speed, clarity and trust \u2014 helping shoppers find daily essentials and deals fast.',
+        features: ['Category-first navigation', 'Deal & promotion banners', 'Clear cart & wishlist actions'],
+        challenge: 'Help users scan a huge catalog without feeling overwhelmed.', solution: 'A bright, scannable layout with strong categories, search and prominent offers up top.', results: 'A approachable shopping flow that surfaces value and reduces decision friction.' },
+      { name: 'Flower Store', sub: 'Retail & Product Experience', role: 'UI/UX & Web Designer', tools: 'Figma, Photoshop, WordPress', img: 'assets/uiux/flower.jpg', h: '340px',
+        desc: 'A delicate retail experience for a florist \u2014 letting product photography and seasonal arrangements take centre stage in a calm, romantic interface.',
+        features: ['Floating glass navigation', 'Featured arrangements grid', 'Story-led brand sections'],
+        challenge: 'Translate the softness of a florist brand into a usable, elegant site.', solution: 'Rounded forms, airy spacing and floating UI that frames each bouquet like art.', results: 'A serene shopping experience that mirrors the brand\u2019s craft and care.' },
+      { name: 'Photography Portfolio', sub: 'Creative Portfolio Design', role: 'UI/UX Designer', tools: 'Figma', img: 'assets/uiux/photography.jpg', h: '300px',
+        desc: 'A bold portfolio for a photographer \u2014 a striking hero, a clean gallery and a layout that lets every frame tell its story.',
+        features: ['High-contrast hero', 'Featured collections grid', 'Client testimonial section'],
+        challenge: 'Showcase a large body of work without diluting impact.', solution: 'A confident yellow-and-dark system with structured galleries and clear hierarchy.', results: 'A memorable creative identity that makes the work the hero.' },
+      { name: '12 Jyotirlinga', sub: 'Information Architecture & Storytelling', role: 'UI/UX Designer', tools: 'Figma, Photoshop', img: 'assets/uiux/jyotirlinga.jpg', h: '320px',
+        desc: 'An informational experience guiding visitors through the twelve sacred Jyotirlinga shrines \u2014 balancing reverence, readability and discovery.',
+        features: ['Narrative card layouts', 'Rich imagery with quotes', 'Structured shrine sections'],
+        challenge: 'Present dense spiritual content in a calm, navigable way.', solution: 'A deep, serene palette with strong typographic rhythm and digestible content cards.', results: 'A storytelling interface that informs without overwhelming.' },
+      { name: 'Harry Potter', sub: 'Creative Concept Design', role: 'UI/UX Designer', tools: 'Figma, Photoshop', img: 'assets/uiux/harry-potter.jpg', h: '300px',
+        desc: 'A self-initiated concept exploring world-building in UI \u2014 translating the Wizarding World\u2019s atmosphere into a moody, immersive landing experience.',
+        features: ['Atmospheric illustrated hero', 'Marquee brand typography', 'Thematic color storytelling'],
+        challenge: 'Capture a beloved universe\u2019s mood while keeping the UI clean.', solution: 'A dusky palette, custom display type and layered scenes that set the tone instantly.', results: 'A concept piece that demonstrates range in art direction and theming.' },
+      { name: 'Personal Portfolio', sub: 'Web Designer Portfolio', role: 'UI/UX & Web Designer', tools: 'Figma, WordPress', img: 'assets/uiux/portfolio.jpg', h: '300px',
+        desc: 'A playful, illustrated portfolio concept introducing Shivani as a web designer \u2014 personality-forward, with a clear call to action.',
+        features: ['Illustrated night-scene hero', 'Download CV CTA', 'About & work sections'],
+        challenge: 'Stand out while staying professional and easy to scan.', solution: 'A warm illustrated world balanced by clean structure and a single strong CTA.', results: 'A friendly first impression that invites visitors to get in touch.' }
+    ];
+    const uiProjects = uiRaw.map(p => {
+      const item = { ...p };
+      item.open = () => this.setState({ lightbox: {
+        cat: p.sub, name: p.name, img: p.img, noImg: false, grad: grad(blue),
+        meta: [{ k: 'ROLE', v: p.role }, { k: 'TYPE', v: p.sub }, { k: 'TOOLS', v: p.tools }],
+        objective: p.challenge,
+        overview: `${p.desc}\n\nKEY FEATURES\n\u2022 ${p.features.join('\n\u2022 ')}\n\nSOLUTION \u2014 ${p.solution}\n\nRESULT \u2014 ${p.results}` } });
+      return item;
+    });
+    const uiProcess = [
+      { n: '01', t: 'Research', d: 'Understanding users and business goals.' },
+      { n: '02', t: 'Wireframing', d: 'Structuring content and user flows.' },
+      { n: '03', t: 'UI Design', d: 'Crafting modern interfaces.' },
+      { n: '04', t: 'Prototype', d: 'Interactive testing and refinement.' },
+      { n: '05', t: 'Development Ready', d: 'Design systems and handoff.' }
+    ];
+    const uiSkills = ['Figma', 'Adobe Photoshop', 'WordPress', 'UI Design', 'UX Design', 'Wireframing', 'Prototyping', 'Responsive Design', 'Design Systems'];
+    const uiStats = [
+      { n: 10, suffix: '+', label: 'Website Designs' },
+      { n: 50, suffix: '+', label: 'UI Screens' },
+      { n: 2, suffix: '+', label: 'Years Experience' },
+      { n: 100, suffix: '%', label: 'Responsive Designs' }
+    ];
+    const beforeAfter = [
+      { n: '01', t: 'Problem', d: 'Frame the real user pain and the business goal behind it.' },
+      { n: '02', t: 'Research', d: 'Talk to users, audit competitors, find the insight that matters.' },
+      { n: '03', t: 'Wireframe', d: 'Shape structure and flow before any visual polish.' },
+      { n: '04', t: 'Final Design', d: 'Layer in brand, motion and detail \u2014 ready for handoff.' }
+    ];
+    const whyCards = [
+      { icon: '\u25ce', t: 'User-Centered Design', d: 'Every decision starts from real user needs and behaviour.' },
+      { icon: '\u25c8', t: 'Business-Focused Solutions', d: 'Design that moves the metrics that matter to you.' },
+      { icon: '\u25a3', t: 'Responsive Experiences', d: 'Pixel-perfect across desktop, tablet and mobile.' },
+      { icon: '\u2726', t: 'Modern Visual Design', d: 'Current, confident interfaces with strong craft.' },
+      { icon: '\u26a1', t: 'Fast Turnaround', d: 'Reliable delivery without cutting corners.' },
+      { icon: '\u25c9', t: 'Creative Problem Solving', d: 'Fresh thinking for tricky product challenges.' }
+    ];
+
+    const sendLabels = ['Send a Message', 'Sending...', 'Message Sent ✓'];
+    const sendIcons = ['↗', '◌', '✓'];
+
+    return {
+      isHome: page === 'home', isSocial: page === 'social', isUiux: page === 'uiux',
+      goHome: go('home'), goSocial: go('social'), goUiux: go('uiux'),
+      goWork: scrollTo('featured'), goContact: page === 'home' ? scrollTo('contact') : go('home'),
+      menuOpen: st.menuOpen || false,
+      toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })),
+      closeMenu: () => this.setState({ menuOpen: false }),
+      navMobile: [
+        { label: 'Home', go: () => { this.setState({ menuOpen: false }); go('home')(); } },
+        { label: 'Social Media', go: () => { this.setState({ menuOpen: false }); go('social')(); } },
+        { label: 'UI/UX', go: () => { this.setState({ menuOpen: false }); go('uiux')(); } }
+      ],
+      nav: [
+        { label: 'Home', go: go('home') },
+        { label: 'Social Media', go: go('social') },
+        { label: 'UI/UX', go: go('uiux') }
+      ],
+      expertise: [
+        { n: '01', icon: '◎', t: 'UI/UX Design', d: 'User-centered interfaces, wireframes, and prototypes that turn complexity into clarity.' },
+        { n: '02', icon: '⌘', t: 'Website Design', d: 'Modern, responsive marketing sites and web apps built to convert and delight.' },
+        { n: '03', icon: '✦', t: 'Social Media Design', d: 'Scroll-stopping posts, carousels, and campaigns that grow engagement.' },
+        { n: '04', icon: '◈', t: 'Brand Identity', d: 'Logos, systems, and visual languages that make brands unmistakable.' }
+      ],
+      journey: [
+        { year: '2024', role: 'UI/UX Design Internship', org: 'Internship Studio' },
+        { year: '2024', role: 'UI/UX Internship', org: 'Tutedude' },
+        { year: '2025 — Present', role: 'UI/UX Designer & Web Designer', org: 'GigaWebZone' }
+      ],
+      education: [
+        { deg: 'MCA', school: 'Lakshmi Narain College of Technology', year: '2020' },
+        { deg: 'BCA', school: 'Dev Sanskriti Vishwavidyalaya', year: '2018' }
+      ],
+      contacts: [
+        { icon: '✆', label: 'Phone', value: '+91 70893 45954', href: 'tel:+917089345954' },
+        { icon: '✉', label: 'Email', value: 'patidarshivani150@gmail.com', href: 'mailto:patidarshivani150@gmail.com' },
+        { icon: 'in', label: 'LinkedIn', value: 'in/shivani-patidar-uiux', href: 'https://www.linkedin.com/in/shivani-patidar-uiux/' }
+      ],
+      catChips, galleryFiltered, cases, plans, compare,
+      projects, projectsFiltered, pfilters, featured, stats,
+      uiProjects, uiProcess, uiSkills, uiStats, beforeAfter, whyCards,
+      lightbox: st.lightbox || null,
+      closeLightbox: () => this.setState({ lightbox: null }),
+      stop: (e) => e.stopPropagation(),
+      sendLabel: sendLabels[sendStateVal], sendIcon: sendIcons[sendStateVal],
+      sendMsg: () => {
+        if (this.state && this.state.sendState) return;
+        this.setState({ sendState: 1 });
+        setTimeout(() => this.setState({ sendState: 2 }), 1300);
+        setTimeout(() => this.setState({ sendState: 0 }), 3600);
+      }
+    };
+  }
+
+  componentDidMount() {
+    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
+    window.scrollTo(0, 0);
+    this._raf = null; this._tweens = []; this._mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+    this._cur = { x: window.innerWidth / 2, y: window.innerHeight / 2, rx: window.innerWidth / 2, ry: window.innerHeight / 2 };
+    this._setupLenis();
+    this._setupCanvas();
+    this._setupCursor();
+    this._collect();
+    this._loop();
+    this._loader();
+    window.addEventListener('resize', this._onResize = () => this._resizeCanvas());
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const pp = prevState || {}, ns = this.state || {};
+    if (pp.currentPage !== ns.currentPage || pp.galleryCat !== ns.galleryCat || pp.projectCat !== ns.projectCat) {
+      setTimeout(() => this._collect(), 40);
+    }
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this._raf);
+    window.removeEventListener('resize', this._onResize);
+    if (window.__lenis) { try { window.__lenis.destroy(); } catch (e) {} window.__lenis = null; }
+  }
+
+  _loader() {
+    setTimeout(() => {
+      const l = document.getElementById('sp-loader');
+      if (!l) return;
+      l.style.transition = 'opacity .8s ease, transform .8s ease';
+      l.style.opacity = '0';
+      l.style.transform = 'translateY(-40px)';
+      setTimeout(() => { l.style.display = 'none'; }, 850);
+    }, 2500);
+  }
+
+  _setupLenis() {
+    try {
+      if (window.Lenis && !window.__lenis) {
+        window.__lenis = new window.Lenis({ duration: 1.15, smoothWheel: true, lerp: 0.09 });
+      }
+    } catch (e) {}
+  }
+
+  _setupCursor() {
+    if (this._cursorBound) return;
+    this._cursorBound = true;
+    window.addEventListener('mousemove', (e) => {
+      this._cur.x = e.clientX; this._cur.y = e.clientY;
+      this._mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+      this._mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+    document.addEventListener('mouseover', (e) => {
+      const t = e.target.closest('[data-cursor], a, button');
+      const c = document.getElementById('sp-cursor');
+      if (!c) return;
+      if (t) { c.style.width = '56px'; c.style.height = '56px'; c.style.background = 'rgba(57,255,142,.1)'; c.style.borderColor = 'rgba(57,255,142,.9)'; }
+      else { c.style.width = '34px'; c.style.height = '34px'; c.style.background = 'transparent'; c.style.borderColor = 'rgba(57,255,142,.7)'; }
+    });
+  }
+
+  _resizeCanvas() {
+    const c = document.getElementById('sp-canvas');
+    if (!c) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = window.innerWidth * dpr; c.height = window.innerHeight * dpr;
+    this._ctx = c.getContext('2d'); this._ctx.scale(dpr, dpr);
+    this._cw = window.innerWidth; this._ch = window.innerHeight;
+  }
+
+  _setupCanvas() {
+    this._resizeCanvas();
+    const n = window.innerWidth < 700 ? 38 : 78;
+    this._particles = Array.from({ length: n }, () => ({
+      x: Math.random() * this._cw, y: Math.random() * this._ch,
+      vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.8 + 0.6, g: Math.random() > 0.5
+    }));
+  }
+
+  _drawParticles() {
+    const ctx = this._ctx; if (!ctx) return;
+    ctx.clearRect(0, 0, this._cw, this._ch);
+    const ps = this._particles;
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = this._cw; if (p.x > this._cw) p.x = 0;
+      if (p.y < 0) p.y = this._ch; if (p.y > this._ch) p.y = 0;
+      const col = p.g ? '57,255,142' : '43,123,255';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${col},0.7)`;
+      ctx.shadowBlur = 8; ctx.shadowColor = `rgba(${col},0.8)`;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      for (let j = i + 1; j < ps.length; j++) {
+        const q = ps[j];
+        const dx = p.x - q.x, dy = p.y - q.y; const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 130) {
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `rgba(${col},${0.12 * (1 - d / 130)})`;
+          ctx.lineWidth = 0.6; ctx.stroke();
+        }
+      }
+    }
+  }
+
+  _collect() {
+    this._parallax = [...document.querySelectorAll('[data-parallax]')].map(el => ({ el, s: parseFloat(el.dataset.parallax) }));
+    this._rotates = [...document.querySelectorAll('[data-rotate]')].map(el => ({ el, base: parseFloat(el.dataset.rotate) }));
+    // tilt
+    document.querySelectorAll('[data-tilt]').forEach(el => {
+      if (el._tiltBound) return; el._tiltBound = true;
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `perspective(900px) rotateY(${px * 12}deg) rotateX(${-py * 12}deg) translateZ(8px)`;
+      });
+      el.addEventListener('pointerleave', () => { el.style.transform = 'perspective(900px) rotateY(0) rotateX(0)'; });
+    });
+    // magnetic
+    document.querySelectorAll('[data-magnetic]').forEach(el => {
+      if (el._magBound) return; el._magBound = true;
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = (e.clientX - r.left - r.width / 2) * 0.3;
+        const my = (e.clientY - r.top - r.height / 2) * 0.4;
+        el.style.transform = `translate(${mx}px, ${my}px)`;
+      });
+      el.addEventListener('pointerleave', () => { el.style.transform = 'translate(0,0)'; });
+    });
+    // reveal: manual rAF tween (robust where document timeline / CSS transitions are paused)
+    this._reveals = [...document.querySelectorAll('[data-reveal]')].filter(el => !el.__revDone);
+    this._reveals.forEach((el, i) => { el.__rdelay = Math.min(i % 4, 3) * 90; });
+    // count-up numbers
+    this._counts = [...document.querySelectorAll('[data-countup]')].filter(el => !el.__cdone);
+    this._counts.forEach(el => { el.__ctarget = parseFloat(el.dataset.countup); el.__cstart = null; });
+    // 3d gallery frames
+    this._frames = [...document.querySelectorAll('[data-frame]')];
+  }
+
+  _framePass() {
+    if (!this._frames || !this._frames.length) return;
+    const cx = window.innerWidth / 2;
+    for (const el of this._frames) {
+      const r = el.getBoundingClientRect();
+      if (r.right < -200 || r.left > window.innerWidth + 200) continue;
+      const fc = r.left + r.width / 2;
+      const d = Math.max(-1, Math.min(1, (fc - cx) / (window.innerWidth * 0.6)));
+      const rot = -d * 26;
+      const scale = 1 - Math.abs(d) * 0.16;
+      const ty = Math.abs(d) * 26;
+      el.style.transform = `perspective(1400px) rotateY(${rot}deg) scale(${scale}) translateY(${ty}px)`;
+      el.style.zIndex = String(100 - Math.round(Math.abs(d) * 50));
+      el.style.opacity = String(1 - Math.abs(d) * 0.35);
+    }
+  }
+
+  _countPass(now) {
+    if (!this._counts || !this._counts.length) return;
+    const h = window.innerHeight;
+    const keep = [];
+    for (const el of this._counts) {
+      if (isNaN(el.__ctarget)) { el.__cdone = true; continue; }
+      const top = el.getBoundingClientRect().top;
+      if (el.__cstart == null) {
+        if (top < h * 0.86 && top > -200) el.__cstart = now;
+        else { keep.push(el); continue; }
+      }
+      let p = (now - el.__cstart) / 1300;
+      if (p > 1) p = 1;
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = (el.dataset.prefix || '') + Math.round(el.__ctarget * e).toLocaleString('en-IN') + (el.dataset.suffix || '');
+      if (p < 1) keep.push(el); else el.__cdone = true;
+    }
+    this._counts = keep;
+  }
+
+  _revealPass() {
+    if (!this._reveals || !this._reveals.length) return;
+    const h = window.innerHeight;
+    const still = [];
+    for (const el of this._reveals) {
+      const top = el.getBoundingClientRect().top;
+      if (top < h * 0.9) { this._tweens.push({ el, start: performance.now(), dur: 820, delay: el.__rdelay || 0 }); }
+      else { still.push(el); }
+    }
+    this._reveals = still;
+  }
+
+  _tweenPass(now) {
+    if (!this._tweens || !this._tweens.length) return;
+    const keep = [];
+    for (const tw of this._tweens) {
+      let p = (now - tw.start - tw.delay) / tw.dur;
+      if (p < 0) { keep.push(tw); continue; }
+      if (p > 1) p = 1;
+      const e = 1 - Math.pow(1 - p, 3);
+      tw.el.style.opacity = e;
+      tw.el.style.transform = 'translateY(' + ((1 - e) * 46) + 'px)';
+      if (p < 1) keep.push(tw);
+      else { tw.el.style.transform = 'none'; tw.el.classList.add('in'); tw.el.__revDone = true; }
+    }
+    this._tweens = keep;
+  }
+
+  _loop() {
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (window.__lenis) { try { window.__lenis.raf(performance.now()); } catch (e) {} }
+    this._drawParticles();
+    this._revealPass();
+    this._tweenPass(performance.now());
+    this._countPass(performance.now());
+    this._framePass();
+    const sp = document.getElementById('uiSpot');
+    if (sp) sp.style.transform = 'translate(' + this._cur.rx + 'px,' + this._cur.ry + 'px) translate(-50%,-50%)';
+    // cursor lerp
+    const c = document.getElementById('sp-cursor'), dot = document.getElementById('sp-cursor-dot');
+    if (c && dot) {
+      this._cur.rx += (this._cur.x - this._cur.rx) * 0.16;
+      this._cur.ry += (this._cur.y - this._cur.ry) * 0.16;
+      c.style.transform = `translate(${this._cur.rx - 0}px, ${this._cur.ry - 0}px) translate(-50%,-50%)`;
+      dot.style.transform = `translate(${this._cur.x}px, ${this._cur.y}px) translate(-50%,-50%)`;
+    }
+    // mouse smoothing
+    this._mouse.tx += (this._mouse.x - this._mouse.tx) * 0.06;
+    this._mouse.ty += (this._mouse.y - this._mouse.ty) * 0.06;
+    // parallax (scroll)
+    if (this._parallax) this._parallax.forEach(p => { p.el.style.transform = `translateY(${scrollY * p.s}px)`; });
+    // hero orbit mouse parallax
+    const o1 = document.getElementById('orbit2'), portrait = document.getElementById('heroPortrait');
+    if (o1) o1.style.transform = `translate(${this._mouse.tx * 26}px, ${this._mouse.ty * 26}px)`;
+    if (portrait) portrait.style.transform = `translate(${this._mouse.tx * -14}px, ${this._mouse.ty * -10}px)`;
+    // poster fields mouse parallax
+    document.querySelectorAll('[data-poster]').forEach((el, i) => {
+      const depth = (i % 3 + 1) * 8;
+      el.style.marginLeft = (this._mouse.tx * depth) + 'px';
+      el.style.marginTop = (this._mouse.ty * depth) + 'px';
+    });
+    // device scroll rotate
+    if (this._rotates) this._rotates.forEach(r => {
+      const rect = r.el.getBoundingClientRect();
+      const prog = (window.innerHeight - rect.top) / (window.innerHeight + rect.height); // 0..1
+      const rot = r.base * (0.4 + prog * 0.9);
+      r.el.style.transform = `rotateY(${rot}deg)`;
+    });
+    this._raf = requestAnimationFrame(() => this._loop());
+  }
+}
+</script>
+</body>
+</html>
